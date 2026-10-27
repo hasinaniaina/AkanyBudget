@@ -10,7 +10,7 @@ import { Platform } from "react-native";
 export const FieldsColors = {
   green: "#087653",
   darkGreen: "#056347",
-  lightGreen: "#a0b3abff",
+  lightGreen: "#dcf8ecff",
   background: "#F5F8F7",
   white: "#FFFFFF",
   text: "#193C35",

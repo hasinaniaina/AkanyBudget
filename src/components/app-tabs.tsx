@@ -7,7 +7,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: COLORS.green, // Vert quand actif
-        tabBarInactiveTintColor: COLORS.lightGreen, // Gris-vert quand inactif
+        tabBarInactiveTintColor: COLORS.grey, // Gris-vert quand inactif
       }}
     >
       <Tabs.Screen
@@ -37,6 +37,30 @@ export default function TabLayout() {
           title: "Budgets",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="card-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="projet"
+        options={{
+          headerShown: false,
+          title: "Épargne & projets",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="bookmark-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="plus"
+        options={{
+          headerShown: false,
+          title: "Plus",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons
+              name="ellipsis-horizontal-outline"
+              size={size}
+              color={color}
+            />
           ),
         }}
       />

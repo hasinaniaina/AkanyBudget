@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
 
   balanceAmount: {
     color: COLORS.white,
-    fontSize: FontSizes.xlarge,
+    fontSize: FontSizes.large,
     fontWeight: "800",
     letterSpacing: 0.1,
     marginTop: 5,
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    fontSize: FontSizes.medium,
+    fontSize: FontSizes.small,
     fontWeight: "800",
     color: COLORS.text,
   },

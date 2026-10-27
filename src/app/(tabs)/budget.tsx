@@ -193,7 +193,7 @@ export default function BudgetsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F3F9F6",
+    backgroundColor: "#F8FAFC",
   },
   scrollContainer: {
     paddingHorizontal: 20,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   monthText: {
-    fontSize: FontSizes.medium,
+    fontSize: FontSizes.small,
     fontWeight: "600",
     color: COLORS.green,
   },
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     alignItems: "center",
-    borderRadius: 12,
+    borderRadius: 18,
   },
   activeTab: {
     backgroundColor: "#0A5C36",
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   tabText: {
-    fontSize: FontSizes.medium,
+    fontSize: FontSizes.small,
     fontWeight: "500",
     color: "#557A68",
   },
@@ -274,13 +274,13 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   summaryTitle: {
-    fontSize: FontSizes.medium,
+    fontSize: FontSizes.small,
     fontWeight: "600",
     color: COLORS.text,
     marginBottom: 6,
   },
   summaryAmount: {
-    fontSize: FontSizes.xlarge,
+    fontSize: FontSizes.large,
     fontWeight: "bold",
     color: "#0A5C36",
     marginBottom: 2,
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: FontSizes.small,
     fontWeight: "bold",
     color: "#0A5C36",
     marginBottom: 14,

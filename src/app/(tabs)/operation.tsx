@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: FontSizes.medium,
+    fontSize: FontSizes.small,
     color: "#333333",
   },
   filtersRow: {
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     height: 42,
   },
   filterText: {
-    fontSize: FontSizes.medium,
+    fontSize: FontSizes.small,
     color: COLORS.green,
     fontWeight: "500",
   },
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     color: "#B71C1C",
   },
   sectionTitle: {
-    fontSize: FontSizes.medium,
+    fontSize: FontSizes.small,
     fontWeight: "bold",
     color: COLORS.green,
     marginBottom: 14,
