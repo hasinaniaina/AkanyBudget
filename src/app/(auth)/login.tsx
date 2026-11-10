@@ -1,3 +1,5 @@
+import { FontSizes } from "@/constants/theme";
+import { getAllUsers } from "@/services/user";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -16,6 +18,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 // Récupération de la hauteur totale de l'écran du téléphone actuel
 const screenHeight = Dimensions.get("window").height;
@@ -31,8 +34,29 @@ export default function LoginScreen() {
       return;
     }
 
-    // À connecter à ton système d'authentification
-    router.push("/(tabs)");
+    const users = getAllUsers();
+    users.map((user) => {
+      if (identifier == user.email || identifier == user.phone) {
+        if (password == user.password) {
+          router.push({
+            pathname: "/(tabs)",
+            params: { user: JSON.stringify(user) },
+          });
+        } else {
+          Toast.show({
+            type: "error",
+            text1: "Identifiant invalide",
+            text2: "Veuillez entrer les bons identifiants",
+          });
+        }
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Identifiant invalide",
+          text2: "Veuillez entrer les bons identifiants",
+        });
+      }
+    });
   };
 
   return (
@@ -147,7 +171,7 @@ export default function LoginScreen() {
               <TouchableOpacity
                 style={styles.forgotButton}
                 onPress={() => {
-                  // Naviguer vers l'écran de récupération
+                  router.push("/forgotPassword");
                 }}
               >
                 <Text style={styles.forgotText}>Mot de passe oublié ?</Text>
@@ -389,7 +413,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
     height: "100%",
     color: "#245C4D",
-    fontSize: 12,
+    fontSize: FontSizes.small,
     paddingVertical: 0,
   },
 
@@ -409,7 +433,7 @@ const styles = StyleSheet.create({
 
   loginButtonText: {
     color: "#FFFFFF",
-    fontSize: 16,
+    fontSize: FontSizes.small,
     fontWeight: "700",
   },
 
@@ -422,7 +446,7 @@ const styles = StyleSheet.create({
 
   forgotText: {
     color: "#54A99B",
-    fontSize: 12,
+    fontSize: FontSizes.small,
     fontWeight: "600",
   },
 
@@ -438,7 +462,7 @@ const styles = StyleSheet.create({
 
   registerText: {
     color: "#278A78",
-    fontSize: 15,
+    fontSize: FontSizes.small,
     fontWeight: "700",
   },
 });

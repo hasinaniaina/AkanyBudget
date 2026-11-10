@@ -19,6 +19,8 @@ export const FieldsColors = {
   blue: "#3888E9",
   purple: "#E9C5F6",
   grey: "#bebebeff",
+  grenDisabled: "#A0AAB2",
+  red: "#FF0000",
 };
 
 export const FontSizes = {

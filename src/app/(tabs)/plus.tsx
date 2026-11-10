@@ -56,6 +56,12 @@ const menuItems: MenuItem[] = [
     icon: "help-buoy-outline",
     redirect: "../(plusMenu)/aide",
   },
+  {
+    title: "Déconnexion",
+    subtitle: "Se déconnecter de l'application",
+    icon: "log-out-outline",
+    redirect: "../(plusMenu)/deconnexion",
+  },
 ];
 
 function MenuRow({ item }: { item: MenuItem }) {
