@@ -21,6 +21,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="compte"
+        options={{
+          headerShown: false,
+          title: "Mes compte",
+          href: null,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="operation"
         options={{
           headerShown: false,

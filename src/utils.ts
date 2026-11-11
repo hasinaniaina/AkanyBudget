@@ -1,10 +1,12 @@
 import * as Crypto from "expo-crypto";
-import { insertVerificationCode } from "./services/user";
+import * as SecureStore from "expo-secure-store";
+import { User } from "./models/user";
+import { getAllUsers, insertVerificationCode } from "./services/user";
 
 export const phoneNumberRegex =
   /^(?:\+?261|0)(32|33|34|38|39|40|41|42|43|44|45|46|47|48|49)\d{7}$/;
 export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-export const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+export const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 export const getVerificationCode = () => {
   // Générer un code de vérification aléatoire à 6 chiffres
@@ -59,4 +61,45 @@ export function generateId(length: number = 32): string {
     .join("");
 
   return token;
+}
+
+// Fonction pour sauvegarder le token après authentification réussie
+export async function saveUserSession(userId: string): Promise<boolean> {
+  try {
+    // 1. Générer un jeton de session local unique
+    const localSessionToken = Crypto.randomUUID();
+    // 2. Le stocker de manière sécurisée sur le téléphone
+    await SecureStore.setItemAsync("local_session_token", localSessionToken);
+    await SecureStore.setItemAsync("logged_user_id", userId);
+
+    console.log("Connecté hors ligne avec succès !");
+    return true;
+  } catch (error) {
+    console.error("Erreur lors de la sauvegarde du token :", error);
+    return false;
+  }
+}
+
+export async function handleLogout() {
+  await SecureStore.deleteItemAsync("local_session_token");
+  await SecureStore.deleteItemAsync("logged_user_id");
+  // Rediriger ensuite l'utilisateur vers l'écran de connexion
+}
+
+export async function getUserConnected(): Promise<User | null> {
+  const localSessionToken = await SecureStore.getItemAsync(
+    "local_session_token",
+  );
+  const userId = await SecureStore.getItemAsync("logged_user_id");
+
+  if (localSessionToken && userId) {
+    const users = getAllUsers();
+    users.map((user) => {
+      if (user.id == userId) {
+        return user;
+      }
+    });
+  }
+
+  return null;
 }

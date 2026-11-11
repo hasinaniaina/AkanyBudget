@@ -11,7 +11,9 @@ import {
   View,
 } from "react-native";
 
+import { SectionHeader } from "@/components/tabs/dashboard";
 import { FieldsColors as COLORS, FontSizes } from "@/constants/theme";
+import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
@@ -37,25 +39,6 @@ function AccountCard({ icon, title, subtitle, amount, color }: AccountProps) {
       </View>
 
       <Text style={styles.accountAmount}>{amount}</Text>
-    </View>
-  );
-}
-
-function SectionHeader({
-  title,
-  action = "Voir détail",
-  onPress,
-}: {
-  title: string;
-  action?: string;
-  onPress?: () => void;
-}) {
-  return (
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-        <Text style={styles.linkText}>{action}</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -204,7 +187,12 @@ export default function App() {
 
           {/* Mes comptes */}
           <View style={styles.card}>
-            <SectionHeader title="Mes comptes" />
+            <SectionHeader
+              title="Mes comptes"
+              onPress={() => {
+                router.push("/(tabs)/compte");
+              }}
+            />
 
             <AccountCard
               icon="cash-outline"
@@ -485,25 +473,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderWidth: 1,
     borderColor: "#EEF3F1",
-  },
-
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 11,
-  },
-
-  sectionTitle: {
-    fontSize: FontSizes.small,
-    fontWeight: "800",
-    color: COLORS.text,
-  },
-
-  linkText: {
-    color: COLORS.blue,
-    fontSize: FontSizes.small,
-    fontWeight: "600",
   },
 
   accountRow: {

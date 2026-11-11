@@ -1,8 +1,10 @@
 import { FontSizes } from "@/constants/theme";
 import { getAllUsers } from "@/services/user";
+import { saveUserSession } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import {
   Dimensions,
@@ -24,6 +26,8 @@ import Toast from "react-native-toast-message";
 const screenHeight = Dimensions.get("window").height;
 
 export default function LoginScreen() {
+  console.log(SecureStore.getItem("logged_user_id"));
+
   const router = useRouter();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -38,9 +42,10 @@ export default function LoginScreen() {
     users.map((user) => {
       if (identifier == user.email || identifier == user.phone) {
         if (password == user.password) {
+          saveUserSession(user.id!);
+
           router.push({
             pathname: "/(tabs)",
-            params: { user: JSON.stringify(user) },
           });
         } else {
           Toast.show({
@@ -114,8 +119,6 @@ export default function LoginScreen() {
                   autoComplete="username"
                   returnKeyType="next"
                 />
-
-                <Ionicons name="chevron-down" size={17} color="#388F80" />
               </View>
 
               <View style={styles.inputContainer}>
@@ -146,7 +149,7 @@ export default function LoginScreen() {
                   }
                 >
                   <Ionicons
-                    name={showPassword ? "eye-off-outline" : "chevron-down"}
+                    name={showPassword ? "eye-off-outline" : "eye-outline"}
                     size={19}
                     color="#388F80"
                   />

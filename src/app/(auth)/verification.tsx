@@ -5,7 +5,7 @@ import {
   getLastVerificationCode,
   insertUser,
 } from "@/services/user";
-import { generateId } from "@/utils";
+import { generateId, saveUserSession } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
@@ -28,7 +28,48 @@ export default function VerifyEmailScreen() {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef<Array<TextInput | null>>([]);
 
+  // Fonction centralisée pour valider et traiter les 6 chiffres
+  const processCompleteCode = (enteredCode: string) => {
+    const digits = enteredCode.split("");
+    setCode(digits);
+
+    const lastCode = getLastVerificationCode();
+
+    if (Number(enteredCode) === Number(lastCode)) {
+      deleteLastVerificationCode();
+
+      if (view == "createAccount") {
+        const unique_id = generateId();
+        user.id = unique_id;
+
+        insertUser(user);
+        saveUserSession(user.id!);
+
+        router.push({
+          pathname: "/(tabs)",
+        });
+      } else if (view == "forgetPassword") {
+        router.push({
+          pathname: "/(auth)/passwordChange",
+          params: { userParams: JSON.stringify(user) },
+        });
+      }
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Code incorrect !",
+        text2: "Code invalide ou expiré.",
+      });
+    }
+  };
+
   const handleInputChange = (text: string, index: number) => {
+    // Gérer le cas où l'utilisateur colle un code complet (6 chiffres) dans le premier champ
+    if (text.length === 6 && /^\d{6}$/.test(text)) {
+      processCompleteCode(text);
+      return;
+    }
+
     const newCode = [...code];
     newCode[index] = text;
     setCode(newCode);
@@ -38,36 +79,9 @@ export default function VerifyEmailScreen() {
       inputRefs.current[index + 1]?.focus();
     }
 
-    // Vérifier si le code est complet (6 chiffres)
+    // Vérifier si le code est complet case par case
     if (newCode.every((digit) => digit !== "")) {
-      const enteredCode = newCode.join("");
-      const lastCode = getLastVerificationCode();
-
-      if (Number(enteredCode) === Number(lastCode)) {
-        deleteLastVerificationCode();
-
-        if (view == "createAccount") {
-          const unique_id = generateId();
-          user.id = unique_id;
-          insertUser(user);
-
-          router.push({
-            pathname: "/(tabs)",
-            params: { userParams: JSON.stringify(user) },
-          });
-        } else if (view == "forgetPassword") {
-          router.push({
-            pathname: "/(auth)/passwordChange",
-            params: { userParams: JSON.stringify(user) },
-          });
-        }
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Code incorrect !",
-          text2: "Code invalide ou expiré.",
-        });
-      }
+      processCompleteCode(newCode.join(""));
     }
   };
 
@@ -117,7 +131,7 @@ export default function VerifyEmailScreen() {
                 }}
                 style={styles.codeInputBox}
                 keyboardType="number-pad"
-                maxLength={1}
+                maxLength={6} // Permet d'accepter le "paste" global dans le premier input si l'OS le gère
                 value={digit}
                 onChangeText={(text) => handleInputChange(text, index)}
                 onKeyPress={(e) => handleKeyPress(e, index)}
@@ -189,19 +203,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#1A332B",
-  },
-  timerText: {
-    textAlign: "center",
-    fontSize: 14,
-    color: "#719082",
-    marginBottom: 20,
-  },
-  resendButton: {
-    alignItems: "center",
-  },
-  resendButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#0A5C36",
   },
 });
