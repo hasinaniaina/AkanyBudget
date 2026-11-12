@@ -1,13 +1,23 @@
 import { FieldsColors as COLORS } from "@/constants/theme";
+import { useModalStore } from "@/store/useModalStore";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router";
 
 export default function TabLayout() {
+  const isModalOpen = useModalStore((state) => state.isModalOpen);
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: COLORS.green, // Vert quand actif
         tabBarInactiveTintColor: COLORS.grey, // Gris-vert quand inactif
+        tabBarStyle: isModalOpen
+          ? { display: "none" }
+          : {
+              position: "absolute",
+              backgroundColor: "rgba(255, 255, 255, 0.9)", // ou 'transparent'
+              borderTopWidth: 0,
+              elevation: 0, // Pour Android
+            },
       }}
     >
       <Tabs.Screen
