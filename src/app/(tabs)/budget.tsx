@@ -1,5 +1,9 @@
-import { FieldsColors as COLORS, FontSizes } from "@/constants/theme";
+import Annee from "@/components/budget/annee";
+import Mois from "@/components/budget/mois";
+import Trimestre from "@/components/budget/trimestre";
+import { FieldsColors, FontSizes } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
   ScrollView,
@@ -9,366 +13,141 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-// Type pour les catégories de budget
-interface BudgetCategory {
-  id: string;
-  name: string;
-  spent: string;
-  total: string;
-  percentage: number;
-  icon: string;
-  iconBg: string;
-  iconColor: string;
-}
-
-const BUDGET_DATA: BudgetCategory[] = [
-  {
-    id: "1",
-    name: "Alimentation",
-    spent: "800 000",
-    total: "1 000 000 Ar",
-    percentage: 80,
-    icon: "leaf",
-    iconBg: "#0A5C36",
-    iconColor: "#FFFFFF",
-  },
-  {
-    id: "2",
-    name: "Logement",
-    spent: "600 000",
-    total: "800 000 Ar",
-    percentage: 75,
-    icon: "home-outline",
-    iconBg: "#2196F3",
-    iconColor: "#FFFFFF",
-  },
-  {
-    id: "3",
-    name: "Transport",
-    spent: "350 000",
-    total: "500 000 Ar",
-    percentage: 70,
-    icon: "car-outline",
-    iconBg: "#FFA726",
-    iconColor: "#FFFFFF",
-  },
-  {
-    id: "4",
-    name: "Santé et famille",
-    spent: "280 000",
-    total: "400 000 Ar",
-    percentage: 70,
-    icon: "heart-outline",
-    iconBg: "#9C27B0",
-    iconColor: "#FFFFFF",
-  },
-  {
-    id: "5",
-    name: "Autres",
-    spent: "150 000",
-    total: "300 000 Ar",
-    percentage: 50,
-    icon: "radio-button-on-outline",
-    iconBg: "#5C6BC0",
-    iconColor: "#FFFFFF",
-  },
-];
 
 export default function BudgetsScreen() {
-  const [activeTab, setActiveTab] = useState<"categorie" | "activite">(
-    "categorie",
-  );
+  const [selectedPeriod, setSelectedPeriod] = useState<
+    "Mois" | "Trimestre" | "Année"
+  >("Mois");
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView style={styles.safeArea}>
       <ScrollView
-        contentContainerStyle={styles.scrollContainer}
+        style={styles.container}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Titre principal */}
-        <Text style={styles.headerTitle}>Budgets</Text>
-
-        {/* Sélecteur de mois */}
-        <TouchableOpacity style={styles.monthSelector}>
-          <View style={styles.monthSelectorLeft}>
-            <Ionicons name="filter-outline" size={16} color={COLORS.green} />
-            <Text style={styles.monthText}>Décembre 2026</Text>
-          </View>
-          <Ionicons name="chevron-down" size={16} color={COLORS.green} />
-        </TouchableOpacity>
-
-        {/* Onglets (Par catégorie / Par activité) */}
-        <View style={styles.tabsContainer}>
+        {/* 1. EN-TÊTE */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Budgets</Text>
           <TouchableOpacity
-            style={[styles.tab, activeTab === "categorie" && styles.activeTab]}
-            onPress={() => setActiveTab("categorie")}
+            style={styles.manageButton}
+            activeOpacity={0.7}
+            onPress={() => router.push("/(tabs)/(budget)/gestionBudget")}
           >
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === "categorie" && styles.activeTabText,
-              ]}
-            >
-              Par catégorie
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.tab, activeTab === "activite" && styles.activeTab]}
-            onPress={() => setActiveTab("activite")}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === "activite" && styles.activeTabText,
-              ]}
-            >
-              Par activité
-            </Text>
+            <Ionicons name="settings-outline" size={16} color="#117A53" />
+            <Text style={styles.manageButtonText}>Gérer les budgets</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Carte de résumé global du mois */}
-        <View style={styles.mainSummaryCard}>
-          <Text style={styles.summaryTitle}>Dépenses du mois</Text>
-          <Text style={styles.summaryAmount}>2 180 000 Ar</Text>
-          <Text style={styles.summarySubtitle}>sur 3 000 000 Ar</Text>
-
-          {/* Barre de progression globale */}
-          <View style={styles.progressBarBackground}>
-            <View style={[styles.progressBarFill, { width: "73%" }]} />
-          </View>
-          <Text style={styles.progressPercentage}>73%</Text>
-        </View>
-
-        {/* Section Catégories */}
-        <Text style={styles.sectionTitle}>Catégories</Text>
-
-        <View style={styles.categoriesList}>
-          {BUDGET_DATA.map((item) => (
-            <View key={item.id} style={styles.categoryCard}>
-              <View
-                style={[
-                  styles.categoryIconContainer,
-                  { backgroundColor: item.iconBg },
-                ]}
+        {/* 2. SÉLECTEUR DE PÉRIODE (Mois / Trimestre / Année) */}
+        <View style={styles.periodTabsContainer}>
+          {(["Mois", "Trimestre", "Année"] as const).map((period) => {
+            const isActive = selectedPeriod === period;
+            return (
+              <TouchableOpacity
+                key={period}
+                style={[styles.periodTab, isActive && styles.activePeriodTab]}
+                onPress={() => setSelectedPeriod(period)}
+                activeOpacity={0.8}
               >
-                <Ionicons
-                  name={item.icon as any}
-                  size={22}
-                  color={item.iconColor}
-                />
-              </View>
-
-              <View style={styles.categoryInfo}>
-                <View style={styles.categoryHeaderRow}>
-                  <Text style={styles.categoryName}>{item.name}</Text>
-                  <Text style={styles.categoryPercentage}>
-                    {item.percentage}%
-                  </Text>
-                </View>
-
-                <Text style={styles.categoryDetails}>
-                  {item.spent} / {item.total}
+                <Text
+                  style={[
+                    styles.periodTabText,
+                    isActive && styles.activePeriodTabText,
+                  ]}
+                >
+                  {period}
                 </Text>
-
-                {/* Barre de progression de la catégorie */}
-                <View style={styles.catProgressBarBg}>
-                  <View
-                    style={[
-                      styles.catProgressBarFill,
-                      { width: `${item.percentage}%` },
-                    ]}
-                  />
-                </View>
-              </View>
-            </View>
-          ))}
+              </TouchableOpacity>
+            );
+          })}
         </View>
+
+        {selectedPeriod == "Mois" && <Mois />}
+        {selectedPeriod == "Trimestre" && <Trimestre />}
+        {selectedPeriod == "Année" && <Annee />}
+
+        {/* 6. BOUTON BAS DE PAGE */}
+        <TouchableOpacity style={styles.bottomButton} activeOpacity={0.8}>
+          <Text style={styles.bottomButtonText}>
+            Voir toutes les catégories
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: "#F8FAFC",
   },
-  scrollContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    paddingBottom: 40,
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 18,
+    paddingTop: 12,
+    paddingBottom: 30,
+  },
+  /* Header */
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 18,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: FontSizes.xlarge,
     fontWeight: "bold",
-    color: "#0A5C36",
-    marginBottom: 16,
+    color: FieldsColors.green,
   },
-  monthSelector: {
+  manageButton: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#D4E8DE",
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    height: 48,
-    marginBottom: 16,
-    width: "60%",
+    gap: 5,
   },
-  monthSelectorLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  monthText: {
+  manageButtonText: {
     fontSize: FontSizes.small,
     fontWeight: "600",
-    color: COLORS.green,
+    color: "#117A53",
   },
-  tabsContainer: {
+  /* Period Tabs */
+  periodTabsContainer: {
     flexDirection: "row",
-    backgroundColor: "#E6F2EC",
-    borderRadius: 16,
+    backgroundColor: "#EFF3F6",
+    borderRadius: 24,
     padding: 4,
-    marginBottom: 20,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: "center",
-    borderRadius: 18,
-  },
-  activeTab: {
-    backgroundColor: "#0A5C36",
-    shadowColor: "#0A5C36",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  tabText: {
-    fontSize: FontSizes.small,
-    fontWeight: "500",
-    color: "#557A68",
-  },
-  activeTabText: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-  },
-  mainSummaryCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: "#E2ECE6",
-    marginBottom: 24,
-    position: "relative",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  summaryTitle: {
-    fontSize: FontSizes.small,
-    fontWeight: "600",
-    color: COLORS.text,
-    marginBottom: 6,
-  },
-  summaryAmount: {
-    fontSize: FontSizes.large,
-    fontWeight: "bold",
-    color: "#0A5C36",
-    marginBottom: 2,
-  },
-  summarySubtitle: {
-    fontSize: FontSizes.small,
-    color: "#719082",
-    marginBottom: 16,
-  },
-  progressBarBackground: {
-    height: 16,
-    backgroundColor: "#E6F2EC",
-    borderRadius: 5,
-    overflow: "hidden",
-    width: "88%",
-  },
-  progressBarFill: {
-    height: "100%",
-    backgroundColor: COLORS.green,
-    borderRadius: 5,
-  },
-  progressPercentage: {
-    position: "absolute",
-    bottom: 18,
-    right: 20,
-    fontSize: 14,
-    fontWeight: "bold",
-    color: COLORS.text,
-  },
-  sectionTitle: {
-    fontSize: FontSizes.small,
-    fontWeight: "bold",
-    color: "#0A5C36",
     marginBottom: 14,
   },
-  categoriesList: {
-    gap: 12,
-  },
-  categoryCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: "#E2ECE6",
-  },
-  categoryIconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 14,
-  },
-  categoryInfo: {
+  periodTab: {
     flex: 1,
-  },
-  categoryHeaderRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    paddingVertical: 9,
     alignItems: "center",
-    marginBottom: 4,
+    borderRadius: 20,
   },
-  categoryName: {
+  activePeriodTab: {
+    backgroundColor: "#117A53",
+  },
+  periodTabText: {
     fontSize: FontSizes.small,
-    fontWeight: "bold",
-    color: COLORS.text,
+    fontWeight: "600",
+    color: "#64748B",
   },
-  categoryPercentage: {
+  activePeriodTabText: {
+    color: "#FFFFFF",
+  },
+  /* Bottom Button */
+  bottomButton: {
+    backgroundColor: "#EFF3F6",
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  bottomButtonText: {
     fontSize: FontSizes.small,
-    fontWeight: "bold",
-    color: COLORS.text,
-  },
-  categoryDetails: {
-    fontSize: FontSizes.xsmall,
-    color: "#719082",
-    marginBottom: 8,
-  },
-  catProgressBarBg: {
-    height: 6,
-    backgroundColor: "#E6F2EC",
-    borderRadius: 3,
-    overflow: "hidden",
-  },
-  catProgressBarFill: {
-    height: "100%",
-    backgroundColor: COLORS.green,
-    borderRadius: 3,
+    fontWeight: "600",
+    color: "#475569",
   },
 });

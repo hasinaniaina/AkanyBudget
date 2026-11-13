@@ -1,156 +1,195 @@
-import { FieldsColors as COLORS, FontSizes } from "@/constants/theme";
-import { Ionicons } from "@expo/vector-icons";
-import { ExternalPathString, RelativePathString, useRouter } from "expo-router";
-import React from "react";
+import { FieldsColors, FontSizes } from "@/constants/theme";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { RelativePathString, router } from "expo-router";
 import {
-  Pressable,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-type MenuItem = {
+interface MenuItem {
+  id: string;
   title: string;
-  subtitle: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  redirect?: RelativePathString | ExternalPathString;
-};
+  subtitle?: string;
+  icon:
+    | keyof typeof Ionicons.glyphMap
+    | keyof typeof MaterialCommunityIcons.glyphMap;
+  iconLibrary: "Ionicons" | "MaterialCommunityIcons";
+  isHighlighted?: boolean;
+  isDestructive?: boolean;
+  redirect?: string;
+}
 
-const menuItems: MenuItem[] = [
+interface MenuSection {
+  title?: string;
+  items: MenuItem[];
+}
+
+const MENU_SECTIONS: MenuSection[] = [
   {
-    title: "Comptes",
-    subtitle: "Gère tes comptes et soldes",
-    icon: "wallet-outline",
-    redirect: "../(plusMenu)/compte",
+    items: [
+      {
+        id: "profile",
+        title: "Jean RAKOTO",
+        subtitle: "Voir mon profil",
+        icon: "person",
+        iconLibrary: "Ionicons",
+      },
+    ],
   },
   {
-    title: "Rapports",
-    subtitle: "Analyses et graphiques",
-    icon: "stats-chart-outline",
-    redirect: "../(plusMenu)/rapport",
+    title: "GESTION FINANCIÈRE",
+    items: [
+      {
+        id: "revenues",
+        title: "Mes sources de revenus",
+        icon: "briefcase",
+        iconLibrary: "Ionicons",
+        redirect: "/(plusMenu)/sourceRevenu",
+      },
+      {
+        id: "reports",
+        title: "Rapports",
+        icon: "bar-chart",
+        iconLibrary: "Ionicons",
+        isHighlighted: true, // Fond vert clair comme sur l'image
+      },
+    ],
   },
   {
-    title: "Activités",
-    subtitle: "Selon tes activités",
-    icon: "people-outline",
-    redirect: "../(plusMenu)/activite",
+    title: "SAUVEGARDE ET DONNÉES",
+    items: [
+      {
+        id: "backup",
+        title: "Sauvegarde et restauration",
+        icon: "cloud-upload",
+        iconLibrary: "Ionicons",
+      },
+      {
+        id: "export",
+        title: "Exporter mes données",
+        icon: "document-text",
+        iconLibrary: "Ionicons",
+      },
+    ],
   },
   {
-    title: "Profil",
-    subtitle: "Infos et préférences",
-    icon: "person-outline",
-    redirect: "../(plusMenu)/profil",
+    title: "AIDE ET INFORMATIONS",
+    items: [
+      {
+        id: "help",
+        title: "Aide et assistance",
+        icon: "help-circle",
+        iconLibrary: "Ionicons",
+      },
+      {
+        id: "about",
+        title: "À propos d'AkanyBudget",
+        icon: "information-circle",
+        iconLibrary: "Ionicons",
+      },
+    ],
   },
   {
-    title: "Paramètres",
-    subtitle: "Devise, notifications, sécurité",
-    icon: "settings-outline",
-    redirect: "../(plusMenu)/parametre",
-  },
-  {
-    title: "Aide et support",
-    subtitle: "FAQ et assistance",
-    icon: "help-buoy-outline",
-    redirect: "../(plusMenu)/aide",
-  },
-  {
-    title: "Déconnexion",
-    subtitle: "Se déconnecter de l'application",
-    icon: "log-out-outline",
-    redirect: "../(plusMenu)/deconnexion",
+    items: [
+      {
+        id: "logout",
+        title: "Se déconnecter",
+        icon: "log-out",
+        iconLibrary: "Ionicons",
+        isDestructive: true,
+      },
+    ],
   },
 ];
-
-function MenuRow({ item }: { item: MenuItem }) {
-  const router = useRouter();
-  return (
-    <Pressable
-      style={({ pressed }) => [styles.menuRow, pressed && styles.pressedRow]}
-      onPress={() => {
-        if (item.redirect) {
-          // Redirection vers la page correspondante
-          router.push(item.redirect);
-        }
-      }}
-    >
-      <View style={styles.menuIconContainer}>
-        <Ionicons name={item.icon} size={18} color="#164D4B" />
-      </View>
-
-      <View style={styles.menuTextContainer}>
-        <Text style={styles.menuTitle}>{item.title}</Text>
-        <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
-      </View>
-
-      <Ionicons name="chevron-forward" size={15} color="#167A9B" />
-    </Pressable>
-  );
-}
 
 export default function PlusScreen() {
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-
       <ScrollView
-        style={styles.screen}
-        contentContainerStyle={styles.content}
+        style={styles.container}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Titre */}
-        <Text style={styles.pageTitle}>Plus</Text>
+        {/* Titre principal */}
+        <Text style={styles.headerTitle}>Plus</Text>
 
-        {/* Compte MonBudget */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.accountCard,
-            pressed && styles.pressedRow,
-          ]}
-          onPress={() => {
-            // TODO : ouvrir le compte personnel
-          }}
-        >
-          <View style={styles.avatar}>
-            <Ionicons name="person" size={22} color="#FFFFFF" />
+        {MENU_SECTIONS.map((section, sIndex) => (
+          <View key={sIndex} style={styles.sectionContainer}>
+            {section.title && (
+              <Text style={styles.sectionHeaderTitle}>{section.title}</Text>
+            )}
+
+            <View style={styles.sectionCard}>
+              {section.items.map((item, iIndex) => {
+                const isLast = iIndex === section.items.length - 1;
+                return (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={[
+                      styles.menuItem,
+                      item.isHighlighted && styles.highlightedItem,
+                      !isLast && styles.itemBorder,
+                    ]}
+                    activeOpacity={0.7}
+                    onPress={() =>
+                      router.push(item.redirect as RelativePathString)
+                    }
+                  >
+                    {/* Icône avec fond arrondi */}
+                    <View
+                      style={[
+                        styles.iconBox,
+                        item.isDestructive && styles.destructiveIconBox,
+                      ]}
+                    >
+                      {item.iconLibrary === "Ionicons" ? (
+                        <Ionicons
+                          name={item.icon as any}
+                          size={18}
+                          color={item.isDestructive ? "#E53E3E" : "#0A5C36"}
+                        />
+                      ) : (
+                        <MaterialCommunityIcons
+                          name={item.icon as any}
+                          size={20}
+                          color={item.isDestructive ? "#E53E3E" : "#0A5C36"}
+                        />
+                      )}
+                    </View>
+
+                    {/* Textes (Titre + sous-titre éventuel) */}
+                    <View style={styles.menuTextContainer}>
+                      <Text
+                        style={[
+                          styles.menuTitle,
+                          item.isDestructive && styles.destructiveText,
+                        ]}
+                      >
+                        {item.title}
+                      </Text>
+                      {item.subtitle && (
+                        <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
+                      )}
+                    </View>
+
+                    {/* Flèche de navigation */}
+                    {!item.isDestructive && (
+                      <Ionicons
+                        name="chevron-forward"
+                        size={16}
+                        color="#A0AAB2"
+                      />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
-
-          <View style={styles.accountTextContainer}>
-            <Text style={styles.accountTitle}>AkanyBudget</Text>
-            <Text style={styles.accountSubtitle}>Compte personnel</Text>
-          </View>
-
-          <Ionicons name="chevron-forward" size={15} color="#167A9B" />
-        </Pressable>
-
-        {/* Menu */}
-        <View style={styles.menuContainer}>
-          {menuItems.map((item, index) => (
-            <React.Fragment key={item.title}>
-              <MenuRow item={item} />
-              {index < menuItems.length - 1 && (
-                <View style={styles.separator} />
-              )}
-            </React.Fragment>
-          ))}
-        </View>
-
-        {/* Bannière MonBudget */}
-        <View style={styles.promoCard}>
-          <View style={styles.leafContainer}>
-            <Ionicons name="leaf" size={34} color="#0A9C6A" />
-          </View>
-
-          <View style={styles.promoTextContainer}>
-            <Text style={styles.promoTitle}>MonBudget</Text>
-            <Text style={styles.promoDescription}>
-              Simple aujourd'hui,
-              {"\n"}plus de projets demain !
-            </Text>
-          </View>
-        </View>
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
@@ -159,138 +198,80 @@ export default function PlusScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#F8FAFC",
   },
-  screen: {
+  container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
   },
-  content: {
-    paddingHorizontal: 12,
-    paddingTop: 10,
-    paddingBottom: 20,
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 40,
   },
-
-  // En-tête
-  pageTitle: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#173C55",
-    marginBottom: 13,
+  headerTitle: {
+    fontSize: FontSizes.xlarge,
+    fontWeight: "bold",
+    color: FieldsColors.green,
+    marginBottom: 16,
   },
-
-  // Carte du compte
-  accountCard: {
-    minHeight: 54,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 9,
-    paddingVertical: 7,
-    backgroundColor: COLORS.lightGreen,
-    borderRadius: 11,
-    borderWidth: 1,
-    borderColor: "#D9EDF0",
-    marginBottom: 20,
+  sectionContainer: {
+    marginBottom: 16,
   },
-  avatar: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: "#459F99",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 9,
-  },
-  accountTextContainer: {
-    flex: 1,
-    justifyContent: "center",
-    paddingVertical: 10,
-  },
-  accountTitle: {
+  sectionHeaderTitle: {
     fontSize: FontSizes.small,
-    fontWeight: "800",
-    color: COLORS.darkGreen,
-    marginBottom: 2,
+    fontWeight: "700",
+    color: "#719082",
+    marginBottom: 8,
+    marginLeft: 4,
+    letterSpacing: 0.5,
   },
-  accountSubtitle: {
-    fontSize: FontSizes.xsmall,
-    color: COLORS.secondary,
-  },
-
-  // Liste des menus
-  menuContainer: {
+  sectionCard: {
     backgroundColor: "#FFFFFF",
-    marginBottom: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E2ECE7",
+    overflow: "hidden",
   },
-  menuRow: {
-    minHeight: 44,
+  menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 5,
-    paddingVertical: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
   },
-  pressedRow: {
-    opacity: 0.7,
+  itemBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
   },
-  menuIconContainer: {
-    width: 29,
-    height: 29,
-    borderRadius: 10,
-    backgroundColor: "#F0F6F6",
-    alignItems: "center",
+  highlightedItem: {
+    backgroundColor: "#E8F5E9", // Vert très clair pour l'élément actif/sélectionné (ex: Rapports)
+  },
+  iconBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: "#E8F5E9",
     justifyContent: "center",
-    marginRight: 9,
+    alignItems: "center",
+    marginRight: 12,
+  },
+  destructiveIconBox: {
+    backgroundColor: "#FDE8E8",
   },
   menuTextContainer: {
     flex: 1,
-    justifyContent: "center",
   },
   menuTitle: {
     fontSize: FontSizes.small,
-    fontWeight: "700",
-    color: "#24465A",
-    marginBottom: 3,
+    fontWeight: "bold",
+    color: "#1E293B",
+  },
+  destructiveText: {
+    color: "#E53E3E",
   },
   menuSubtitle: {
     fontSize: FontSizes.xsmall,
-    color: "#7A96A5",
-  },
-  separator: {
-    height: 1,
-    backgroundColor: "#F0F3F4",
-    marginLeft: 43,
-  },
-
-  // Bannière inférieure
-  promoCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    minHeight: 66,
-    backgroundColor: "#E5F8F0",
-    borderRadius: 11,
-    marginTop: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 9,
-  },
-  leafContainer: {
-    width: 42,
-    height: 42,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 9,
-  },
-  promoTextContainer: {
-    flex: 1,
-  },
-  promoTitle: {
-    fontSize: FontSizes.xsmall,
-    fontWeight: "800",
-    color: COLORS.darkGreen,
-    marginBottom: 3,
-  },
-  promoDescription: {
-    fontSize: FontSizes.xsmall,
-    lineHeight: 13,
-    color: COLORS.green,
+    color: "#719082",
+    marginTop: 2,
+    fontWeight: "500",
   },
 });

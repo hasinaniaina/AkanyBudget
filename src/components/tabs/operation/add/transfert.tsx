@@ -1,12 +1,14 @@
+import DatePickerField from "@/components/ui/datePickerField";
 import { FontSizes } from "@/constants/theme";
+import { formatDate } from "@/utils";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function Transfert() {
@@ -14,8 +16,12 @@ export default function Transfert() {
     "entre",
   );
   const [montant, setMontant] = useState("0 Ar");
-  const [date, setDate] = useState("15 / 11 / 2026");
   const [description, setDescription] = useState("");
+
+  const [onDateChange, setOnDateChange] = useState<string | undefined>(
+    formatDate(new Date()),
+  );
+  const [showPicker, setShowPicker] = useState(false);
   return (
     <>
       {/* 1. TYPE DE TRANSFERT */}
@@ -104,16 +110,27 @@ export default function Transfert() {
 
       {/* 5. DATE */}
       <Text style={styles.label}>Date</Text>
-      <TouchableOpacity style={styles.inputContainer} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.inputContainer}
+        activeOpacity={0.7}
+        onPress={() => {
+          setShowPicker(!showPicker);
+        }}
+      >
         <Ionicons
           name="calendar-outline"
           size={18}
           color="#719082"
           style={{ marginRight: 8 }}
         />
-        <Text style={[styles.input, { lineHeight: 22 }]}>{date}</Text>
+        <Text style={[styles.input, { lineHeight: 22 }]}>{onDateChange}</Text>
         <Ionicons name="calendar-outline" size={16} color="#719082" />
       </TouchableOpacity>
+      <DatePickerField
+        onDateChange={setOnDateChange}
+        showPicker={showPicker}
+        setShowPicker={setShowPicker}
+      />
 
       {/* 6. DESCRIPTION (OPTIONNEL) */}
       <Text style={styles.label}>Description (optionnel)</Text>

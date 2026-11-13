@@ -190,7 +190,7 @@ export default function App() {
             <SectionHeader
               title="Mes comptes"
               onPress={() => {
-                router.push("/(tabs)/compte");
+                router.push("/(tabs)/(dashboard)/compte");
               }}
             />
 

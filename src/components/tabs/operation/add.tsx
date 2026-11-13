@@ -141,8 +141,8 @@ export default function CustomBottomSheet({
                     )}
                   </View>
 
-                  {type == "Revenu" && <Revenu />}
                   {type == "Dépense" && <Depense />}
+                  {type == "Revenu" && <Revenu />}
                   {type == "Transfert" && <Transfert />}
 
                   {/* BOUTON DE VALIDATION */}

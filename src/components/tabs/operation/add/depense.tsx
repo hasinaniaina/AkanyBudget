@@ -1,25 +1,49 @@
+import CustomDropdown from "@/components/ui/CustomDropdown";
+import DatePickerField from "@/components/ui/datePickerField";
 import { FontSizes } from "@/constants/theme";
+import { formatDate } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+
+interface isOpenInterface {
+  categorie: boolean;
+  compte: boolean;
+}
 
 export default function Depense() {
   const [montant, setMontant] = useState("0");
   const [categorie, setCategorie] = useState("Alimentaion");
-  const [date, setDate] = useState("03 / 11 / 2026");
   const [compte, setCompte] = useState("Mobile Money");
   const [libelle, setLibelle] = useState("");
+  const [isOpen, setIsOpen] = useState<isOpenInterface>({
+    categorie: false,
+    compte: false,
+  });
+  const [selectedCategorie, setSelecteCategorie] = useState<string>();
+  const [selectedCompte, setSelectedCompte] = useState<string>();
+  const options = {
+    categorie: ["Alimentation", "Frais de santé", "Transfert mobile"],
+    compte: ["Espèce", "Banque", "Mobile money"],
+  };
+
+  const placeholder = "Sélectionner...";
+
+  const [onDateChange, setOnDateChange] = useState<string | undefined>(
+    formatDate(new Date()),
+  );
+  const [showPicker, setShowPicker] = useState(false);
 
   return (
     <>
       {/* 2. MONTANT (AR) */}
-      <Text style={styles.label}>MONTANT (AR)</Text>
+      <Text style={styles.label}>Montant (Ar)</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.amountInput}
@@ -34,35 +58,104 @@ export default function Depense() {
       </View>
 
       {/* 3. CATÉGORIE */}
-      <Text style={styles.label}>CATÉGORIE</Text>
-      <TouchableOpacity style={styles.selectInput} activeOpacity={0.7}>
-        <Text style={styles.selectText}>{categorie}</Text>
-        <Ionicons name="chevron-down" size={16} color="#1A332B" />
+      <Text style={styles.label}>Catégorie</Text>
+
+      {/* 1. Le TouchableOpacity déclencheur */}
+      <TouchableOpacity
+        style={styles.selectInput}
+        activeOpacity={0.7}
+        onPress={() => {
+          setIsOpen({ ...isOpen, categorie: !isOpen.categorie });
+          if (isOpen.compte) {
+            setIsOpen({ ...isOpen, compte: !isOpen.compte });
+          }
+        }}
+      >
+        <Text
+          style={[
+            styles.selectText,
+            !selectedCategorie && styles.placeholderText,
+          ]}
+        >
+          {selectedCategorie || placeholder}
+        </Text>
+        <Ionicons
+          name={isOpen.categorie ? "chevron-up" : "chevron-down"}
+          size={16}
+          color="#1A332B"
+        />
       </TouchableOpacity>
+      <CustomDropdown
+        options={options.categorie}
+        selectedValue={placeholder}
+        isOpen={isOpen.categorie}
+        setIsOpen={() => {
+          setIsOpen({ ...isOpen, categorie: !isOpen.categorie });
+        }}
+        onSelect={setSelecteCategorie}
+      />
 
       {/* 4. DATE ET COMPTE */}
       <View style={styles.row}>
         <View style={styles.flex1}>
-          <Text style={styles.label}>DATE</Text>
-          <TouchableOpacity style={styles.selectInput} activeOpacity={0.7}>
-            <Text style={styles.selectText}>{date}</Text>
+          <Text style={styles.label}>Date</Text>
+          <TouchableOpacity
+            style={styles.selectInput}
+            activeOpacity={0.7}
+            onPress={() => {
+              setShowPicker(!showPicker);
+            }}
+          >
+            <Text style={styles.selectText}>{onDateChange}</Text>
             <Ionicons name="calendar-outline" size={16} color="#719082" />
           </TouchableOpacity>
+          <DatePickerField
+            onDateChange={setOnDateChange}
+            showPicker={showPicker}
+            setShowPicker={setShowPicker}
+          />
         </View>
 
         <View style={{ width: 12 }} />
 
         <View style={styles.flex1}>
-          <Text style={styles.label}>COMPTE</Text>
-          <TouchableOpacity style={styles.selectInput} activeOpacity={0.7}>
-            <Text style={styles.selectText}>{compte}</Text>
-            <Ionicons name="chevron-down" size={16} color="#1A332B" />
+          <Text style={styles.label}>Compte</Text>
+          <TouchableOpacity
+            style={styles.selectInput}
+            activeOpacity={0.7}
+            onPress={() => {
+              setIsOpen({ ...isOpen, compte: !isOpen.compte });
+              if (isOpen.categorie) {
+                setIsOpen({ ...isOpen, categorie: !isOpen.categorie });
+              }
+            }}
+          >
+            <Text
+              style={[
+                styles.selectText,
+                !selectedCompte && styles.placeholderText,
+              ]}
+            >
+              {selectedCompte || placeholder}
+            </Text>
+            <Ionicons
+              name={isOpen.compte ? "chevron-up" : "chevron-down"}
+              size={16}
+              color="#1A332B"
+            />
           </TouchableOpacity>
+          <CustomDropdown
+            options={options.compte}
+            selectedValue={placeholder}
+            isOpen={isOpen.compte}
+            setIsOpen={() => setIsOpen({ ...isOpen, compte: !isOpen.compte })}
+            onSelect={setSelectedCompte}
+          />
         </View>
       </View>
 
       {/* 5. LIBELLÉ / NOTE */}
-      <Text style={styles.label}>LIBELLÉ / NOTE</Text>
+      <Text style={styles.label}>Description (optionnel)</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.textInput}
@@ -142,6 +235,11 @@ const styles = StyleSheet.create({
     height: 48,
     alignItems: "center",
     justifyContent: "space-between",
+  },
+
+  placeholderText: {
+    color: "#A0AAB2",
+    fontWeight: "500",
   },
   selectText: {
     fontSize: FontSizes.small,

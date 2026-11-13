@@ -74,7 +74,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F3F9F6", // Fond vert très clair AkanyBudget
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingTop: 16,
+    paddingBottom: 115,
   },
   header: {
     flexDirection: "row",

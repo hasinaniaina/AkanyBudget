@@ -103,3 +103,10 @@ export async function getUserConnected(): Promise<User | null> {
 
   return null;
 }
+
+export const formatDate = (rawDate: Date): string => {
+  const day = String(rawDate.getDate()).padStart(2, "0");
+  const month = String(rawDate.getMonth() + 1).padStart(2, "0");
+  const year = rawDate.getFullYear();
+  return `${day} / ${month} / ${year}`;
+};

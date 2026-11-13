@@ -31,7 +31,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="compte"
+        name="(dashboard)/compte"
         options={{
           headerShown: false,
           title: "Mes compte",
@@ -58,6 +58,28 @@ export default function TabLayout() {
           title: "Budgets",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="card-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="(budget)/gestionBudget"
+        options={{
+          headerShown: false,
+          title: "Gestion des budgets",
+          href: null,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="(budget)/creationCategorie"
+        options={{
+          headerShown: false,
+          title: "Création d'une catégorie",
+          href: null,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
           ),
         }}
       />
