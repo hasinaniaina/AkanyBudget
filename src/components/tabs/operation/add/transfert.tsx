@@ -1,3 +1,4 @@
+import CustomTypeTransfertDropdown from "@/components/ui/customTypeTransfertDropdown";
 import DatePickerField from "@/components/ui/datePickerField";
 import { FontSizes } from "@/constants/theme";
 import { formatDate } from "@/utils";
@@ -11,6 +12,11 @@ import {
   View,
 } from "react-native";
 
+interface IsOpenInterface {
+  from: boolean;
+  to: boolean;
+}
+
 export default function Transfert() {
   const [typeTransfert, setTypeTransfert] = useState<"entre" | "tiers">(
     "entre",
@@ -18,15 +24,22 @@ export default function Transfert() {
   const [montant, setMontant] = useState("0 Ar");
   const [description, setDescription] = useState("");
 
-  const [onDateChange, setOnDateChange] = useState<string | undefined>(
-    formatDate(new Date()),
-  );
-  const [showPicker, setShowPicker] = useState(false);
+  const currentDate = new Date().toISOString().split("T")[0];
+  const [selectedDate, setSelectedDate] = useState(currentDate);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const [selectedFrom, setSelectedFrom] = useState<string>("Compte bancaire");
+  const [selectedTo, setSelectedTo] = useState<string>("Mobile money");
+  const [isOpen, setIsOpen] = useState<IsOpenInterface>({
+    from: false,
+    to: false,
+  });
+  const options = ["Compte bancaire", "Mobile Money"];
   return (
     <>
       {/* 1. TYPE DE TRANSFERT */}
       <Text style={styles.label}>Type de transfert</Text>
-      <View style={styles.typeContainer}>
+      {/* <View style={styles.typeContainer}>
         <TouchableOpacity
           style={[
             styles.typeButton,
@@ -68,31 +81,68 @@ export default function Transfert() {
             Vers un tiers
           </Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       {/* 2. COMPTE SOURCE ("DE") */}
-      <TouchableOpacity style={styles.accountCard} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.accountCard}
+        activeOpacity={0.7}
+        onPress={() => {
+          setIsOpen({ ...isOpen, from: !isOpen.from });
+          if (isOpen.to) {
+            setIsOpen({ ...isOpen, to: !isOpen.to });
+          }
+        }}
+      >
         <View style={[styles.iconBox, { backgroundColor: "#E8F1FC" }]}>
           <Ionicons name="business-outline" size={20} color="#2B6CB0" />
         </View>
         <View style={styles.accountInfo}>
           <Text style={styles.accountLabel}>De</Text>
-          <Text style={styles.accountValue}>Compte bancaire (courant)</Text>
+          <Text style={styles.accountValue}>{selectedFrom}</Text>
         </View>
         <Ionicons name="chevron-forward" size={18} color="#A0AAB2" />
       </TouchableOpacity>
+      <CustomTypeTransfertDropdown
+        options={options}
+        isOpen={isOpen.from}
+        setIsOpen={() => {
+          setIsOpen({ ...isOpen, from: !isOpen.from });
+        }}
+        selectedValue={selectedFrom}
+        onSelect={setSelectedFrom}
+      />
 
       {/* 3. COMPTE DESTINATION ("VERS") */}
-      <TouchableOpacity style={styles.accountCard} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.accountCard}
+        activeOpacity={0.7}
+        onPress={() => {
+          setIsOpen({ ...isOpen, to: !isOpen.to });
+
+          if (isOpen.from) {
+            setIsOpen({ ...isOpen, from: !isOpen.from });
+          }
+        }}
+      >
         <View style={[styles.iconBox, { backgroundColor: "#FDE8E8" }]}>
           <MaterialCommunityIcons name="cellphone" size={20} color="#E53E3E" />
         </View>
         <View style={styles.accountInfo}>
           <Text style={styles.accountLabel}>Vers</Text>
-          <Text style={styles.accountValue}>Mobile Money</Text>
+          <Text style={styles.accountValue}>{selectedTo}</Text>
         </View>
         <Ionicons name="chevron-forward" size={18} color="#A0AAB2" />
       </TouchableOpacity>
+      <CustomTypeTransfertDropdown
+        options={options}
+        isOpen={isOpen.to}
+        setIsOpen={() => {
+          setIsOpen({ ...isOpen, to: !isOpen.to });
+        }}
+        selectedValue={selectedTo}
+        onSelect={setSelectedTo}
+      />
 
       {/* 4. MONTANT */}
       <Text style={styles.label}>Montant</Text>
@@ -114,7 +164,7 @@ export default function Transfert() {
         style={styles.inputContainer}
         activeOpacity={0.7}
         onPress={() => {
-          setShowPicker(!showPicker);
+          setModalVisible(!modalVisible);
         }}
       >
         <Ionicons
@@ -123,13 +173,16 @@ export default function Transfert() {
           color="#719082"
           style={{ marginRight: 8 }}
         />
-        <Text style={[styles.input, { lineHeight: 22 }]}>{onDateChange}</Text>
+        <Text style={[styles.input, { lineHeight: 22 }]}>
+          {formatDate(new Date(selectedDate))}
+        </Text>
         <Ionicons name="calendar-outline" size={16} color="#719082" />
       </TouchableOpacity>
       <DatePickerField
-        onDateChange={setOnDateChange}
-        showPicker={showPicker}
-        setShowPicker={setShowPicker}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
       />
 
       {/* 6. DESCRIPTION (OPTIONNEL) */}

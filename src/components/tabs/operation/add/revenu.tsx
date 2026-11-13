@@ -36,10 +36,9 @@ export default function Revenu() {
   };
 
   const placeholder = "Sélectionner...";
-  const [onDateChange, setOnDateChange] = useState<string | undefined>(
-    formatDate(new Date()),
-  );
-  const [showPicker, setShowPicker] = useState(false);
+  const currentDate = new Date().toISOString().split("T")[0];
+  const [selectedDate, setSelectedDate] = useState(currentDate);
+  const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <>
@@ -103,16 +102,19 @@ export default function Revenu() {
             style={styles.selectInput}
             activeOpacity={0.7}
             onPress={() => {
-              setShowPicker(!showPicker);
+              setModalVisible(!modalVisible);
             }}
           >
-            <Text style={styles.selectText}>{onDateChange}</Text>
+            <Text style={styles.selectText}>
+              {formatDate(new Date(selectedDate))}
+            </Text>
             <Ionicons name="calendar-outline" size={16} color="#719082" />
           </TouchableOpacity>
           <DatePickerField
-            onDateChange={setOnDateChange}
-            showPicker={showPicker}
-            setShowPicker={setShowPicker}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            modalVisible={modalVisible}
+            setModalVisible={setModalVisible}
           />
         </View>
 

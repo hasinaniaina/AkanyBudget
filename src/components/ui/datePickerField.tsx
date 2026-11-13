@@ -1,83 +1,168 @@
-import { useState } from "react";
-import { Platform, StyleSheet as RNStyleSheet, View } from "react-native"; // ou de 'react-native' selon vos imports
-import DateTimePicker, { DateType } from "react-native-ui-datepicker";
+import { FieldsColors } from "@/constants/theme";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Calendar, LocaleConfig } from "react-native-calendars";
 
-interface DatePickerFieldProps {
-  label?: string;
-  onDateChange: (formattedDate: string) => void; // Fonction pour mettre à jour l'état dans votre formulaire parent
-  showPicker: boolean;
-  setShowPicker: (show: boolean) => void;
+// Configuration du calendrier en français
+LocaleConfig.locales["fr"] = {
+  monthNames: [
+    "Janvier",
+    "Février",
+    "Mars",
+    "Avril",
+    "Mai",
+    "Juin",
+    "Juillet",
+    "Août",
+    "Septembre",
+    "Octobre",
+    "Novembre",
+    "Décembre",
+  ],
+  monthNamesShort: [
+    "Jan.",
+    "Fév.",
+    "Mar.",
+    "Avr.",
+    "Mai",
+    "Juin",
+    "Juil.",
+    "Août",
+    "Sept.",
+    "Oct.",
+    "Nov.",
+    "Déc.",
+  ],
+  dayNames: [
+    "Dimanche",
+    "Lundi",
+    "Mardi",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi",
+  ],
+  dayNamesShort: ["Dim.", "Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam."],
+  today: "Aujourd'hui",
+};
+
+LocaleConfig.defaultLocale = "fr";
+
+interface DatePickerInterface {
+  modalVisible: boolean;
+  setModalVisible: (value: boolean) => void;
+  selectedDate: string;
+  setSelectedDate: (value: string) => void;
 }
 
 export default function DatePickerField({
-  label = "DATE",
-  onDateChange,
-  showPicker,
-  setShowPicker,
-}: DatePickerFieldProps) {
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  modalVisible,
+  setModalVisible,
+  selectedDate,
+  setSelectedDate,
+}: DatePickerInterface) {
+  // Date actuelle au format YYYY-MM-DD
 
-  // Gérer le clic sur une date dans le calendrier natif
-  const onChange = (selectedDate?: DateType) => {
-    // Sur Android, le picker se ferme tout seul. Sur iOS, on gère l'affichage.
-    if (Platform.OS === "android") {
-      setShowPicker(false);
-    }
-
-    console.log(selectedDate);
-
-    // if (selectedDate) {
-    //   setCurrentDate(selectedDate);
-    //   const formatted = formatDate(selectedDate);
-
-    //   onDateChange(formatted);
-    //   setShowPicker(false);
-    // }
+  // Sélection d'une date
+  const onDayPress = (day: any) => {
+    setSelectedDate(day.dateString);
+    setModalVisible(false);
   };
 
   return (
-    <View style={styles.container}>
-      {/* POPUP DU CALENDRIER NATIF */}
-      {showPicker && (
-        <DateTimePicker
-          date={currentDate}
-          mode="single"
-          onChange={({ date }) => {
-            onChange(date);
-          }}
-        />
-      )}
-    </View>
+    <>
+      <View style={styles.container}>
+        {/* Popup calendrier */}
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Sélectionner une date</Text>
+
+              <Calendar
+                current={selectedDate}
+                onDayPress={onDayPress}
+                markedDates={{
+                  [selectedDate]: {
+                    selected: true,
+                    selectedColor: FieldsColors.green,
+                  },
+                }}
+                enableSwipeMonths={true}
+                theme={{
+                  todayTextColor: FieldsColors.green,
+                  arrowColor: FieldsColors.green,
+                  textMonthFontWeight: "bold",
+                  textDayFontSize: 15,
+                  textMonthFontSize: 17,
+                }}
+              />
+
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>Fermer</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </>
   );
 }
 
-const styles = RNStyleSheet.create({
+const styles = StyleSheet.create({
+  backdrop: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+  },
   container: {
-    width: "100%",
-    marginBottom: 12,
+    flex: 1,
   },
-  label: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#719082",
-    marginBottom: 6,
-    marginTop: 10,
-    letterSpacing: 0.5,
-  },
-  selectInput: {
-    flexDirection: "row",
-    backgroundColor: "#F8FBFA",
+  dateInput: {
+    height: 50,
     borderWidth: 1,
-    borderColor: "#E2ECE7",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    height: 48,
-    alignItems: "center",
-    justifyContent: "space-between",
+    borderColor: "#CCC",
+    borderRadius: 8,
+    justifyContent: "center",
+    paddingHorizontal: 15,
   },
-  selectText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#1A332B",
+  dateText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContent: {
+    width: "100%",
+    backgroundColor: "#FFF",
+    borderRadius: 15,
+    padding: 15,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  closeButton: {
+    marginTop: 15,
+    backgroundColor: FieldsColors.green,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
