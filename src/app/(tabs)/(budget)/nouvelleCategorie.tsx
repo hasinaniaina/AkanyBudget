@@ -20,6 +20,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 // Palette de couleurs inspirée de l'image
 const COLORS_LIST = [
@@ -62,10 +63,36 @@ export default function CategoryFormScreen() {
     currentPeriodConcerne,
   );
 
+  useEffect(() => {
+    setBudget({ ...budget, period: periodConcerne });
+  }, []);
+
   const saveBudget = () => {
-    const unique_id = generateId();
-    budget.id = unique_id;
-    insertBudget(budget);
+    if (budget.label != "") {
+      const unique_id = generateId();
+      budget.id = unique_id;
+      const isInserted = insertBudget(budget);
+
+      if (isInserted) {
+        Toast.show({
+          type: "success",
+          text1: "Insertion réussi",
+          text2: "L'insertion de la source à été réussi.",
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Insertion Invalide",
+          text2: "Problème d'insertion de la Source.",
+        });
+      }
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Insertion Invalide",
+        text2: "Tout les champs doivent être rempli.",
+      });
+    }
   };
 
   useEffect(() => {
