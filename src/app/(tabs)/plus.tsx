@@ -101,6 +101,7 @@ const MENU_SECTIONS: MenuSection[] = [
         icon: "log-out",
         iconLibrary: "Ionicons",
         isDestructive: true,
+        redirect: "/(plusMenu)/deconnexion",
       },
     ],
   },

@@ -89,7 +89,7 @@ export default function GestionBudget() {
           <TouchableOpacity
             style={styles.addButton}
             activeOpacity={0.8}
-            onPress={() => router.push("/(tabs)/(budget)/creationCategorie")}
+            onPress={() => router.push("/(tabs)/(budget)/nouvelleCategorie")}
           >
             <Ionicons name="add" size={20} color="#FFFFFF" />
           </TouchableOpacity>

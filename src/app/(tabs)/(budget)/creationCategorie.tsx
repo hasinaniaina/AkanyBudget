@@ -1,3 +1,4 @@
+import ListIcon from "@/components/ui/listIcon";
 import { FieldsColors, FontSizes } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -20,16 +21,19 @@ const COLORS_PALETTE = [
   "#F25C54", // Rouge / Rose
   "#9342F5", // Violet
   "#2563EB", // Bleu vif
-  "#FBBF24", // Jaune
+  "#ecac0aff", // Jaune
   "#C6F6D5", // Vert clair pastel
-  "#FEFCBF", // Jaune pastel
-  "#EBF8FF", // Bleu pastel
-  "#EDF2F7", // Gris pastel
+  "#fff700ff", // Jaune pastel
+  "#82c7ecff", // Bleu pastel
+  "#dadadaff", // Gris pastel
 ];
 
 export default function CreateCategoryScreen() {
   const [nomCategorie, setNomCategorie] = useState("");
   const [selectedColor, setSelectedColor] = useState(COLORS_PALETTE[0]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedIcon, setSelectedIcon] =
+    useState<keyof typeof Ionicons.glyphMap>("cash");
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -57,13 +61,10 @@ export default function CreateCategoryScreen() {
 
         {/* 2. CERCLE D'APERÇU DE L'ICÔNE */}
         <View style={styles.iconPreviewContainer}>
-          <View style={[styles.mainIconCircle, { backgroundColor: "#E8F5E9" }]}>
-            <Ionicons name="restaurant" size={44} color="#0A5C36" />
-
-            {/* Petit bouton appareil photo / édition sur l'icône */}
-            <TouchableOpacity style={styles.cameraBadge} activeOpacity={0.8}>
-              <Ionicons name="camera" size={14} color="#0A5C36" />
-            </TouchableOpacity>
+          <View
+            style={[styles.mainIconCircle, { backgroundColor: selectedColor }]}
+          >
+            <Ionicons name={selectedIcon} size={44} color="#FFF" />
           </View>
         </View>
 
@@ -103,16 +104,28 @@ export default function CreateCategoryScreen() {
         </View>
 
         {/* 5. ICÔNE (OPTIONNEL) */}
-        <Text style={styles.label}>Icône (optionnel)</Text>
-        <TouchableOpacity style={styles.iconSelectorButton} activeOpacity={0.7}>
-          <Ionicons
-            name="lock-closed-outline"
-            size={16}
-            color="#475569"
-            style={{ marginRight: 8 }}
+        <View>
+          <Text style={styles.label}>Icône (optionnel)</Text>
+          <TouchableOpacity
+            style={styles.iconSelectorButton}
+            activeOpacity={0.7}
+            onPress={() => setIsOpen(!isOpen)}
+          >
+            <Ionicons
+              name="lock-closed-outline"
+              size={16}
+              color="#475569"
+              style={{ marginRight: 8 }}
+            />
+            <Text style={styles.iconSelectorText}>Choisir une icône</Text>
+          </TouchableOpacity>
+          <ListIcon
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            selectedIcon={selectedIcon}
+            setSelectedIcon={setSelectedIcon}
           />
-          <Text style={styles.iconSelectorText}>Choisir une icône</Text>
-        </TouchableOpacity>
+        </View>
 
         {/* 6. BOUTON DE VALIDATION EN BAS */}
         <TouchableOpacity style={styles.submitButton} activeOpacity={0.8}>

@@ -4,7 +4,7 @@ import { useColorScheme } from "react-native";
 
 import AppTabs from "@/components/app-tabs";
 import AddOperationModal from "@/components/tabs/operation/add";
-import { useModalStore } from "@/store/useModalStore";
+import { useModalStore } from "@/hooks/useModalStore";
 
 SplashScreen.preventAutoHideAsync();
 

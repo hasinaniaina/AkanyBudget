@@ -1,5 +1,4 @@
 import { handleLogout } from "@/utils";
-import { Redirect } from "expo-router";
 import { useEffect } from "react";
 
 export default function deconnexion() {
@@ -7,5 +6,5 @@ export default function deconnexion() {
     handleLogout();
   }, []);
 
-  return <Redirect href="/(auth)/login" />;
+  return <></>;
 }

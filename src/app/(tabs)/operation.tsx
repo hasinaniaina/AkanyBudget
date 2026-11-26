@@ -3,11 +3,11 @@ import Revenue from "@/components/tabs/operation/revenue";
 import Tous from "@/components/tabs/operation/tous";
 import Transfert from "@/components/tabs/operation/transfert";
 import {
-  FieldsColors as COLORS,
-  FieldsColors,
-  FontSizes,
+    FieldsColors as COLORS,
+    FieldsColors,
+    FontSizes,
 } from "@/constants/theme";
-import { useModalStore } from "@/store/useModalStore";
+import { useModalStore } from "@/hooks/useModalStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";

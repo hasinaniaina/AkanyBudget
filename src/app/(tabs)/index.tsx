@@ -12,7 +12,11 @@ import {
 } from "react-native";
 
 import { SectionHeader } from "@/components/tabs/dashboard";
-import { FieldsColors as COLORS, FontSizes } from "@/constants/theme";
+import {
+  FieldsColors as COLORS,
+  FontSizes,
+  PaddingBottom,
+} from "@/constants/theme";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -327,7 +331,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    paddingBottom: 115,
+    paddingBottom: PaddingBottom,
   },
 
   screen: {

@@ -4,7 +4,6 @@ import { saveUserSession } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import {
   Dimensions,
@@ -26,7 +25,7 @@ import Toast from "react-native-toast-message";
 const screenHeight = Dimensions.get("window").height;
 
 export default function LoginScreen() {
-  console.log(SecureStore.getItem("logged_user_id"));
+  // console.log(SecureStore.getItem("logged_user_id"));
 
   const router = useRouter();
   const [identifier, setIdentifier] = useState("");
@@ -39,14 +38,23 @@ export default function LoginScreen() {
     }
 
     const users = getAllUsers();
-    users.map((user) => {
-      if (identifier == user.email || identifier == user.phone) {
-        if (password == user.password) {
-          saveUserSession(user.id!);
 
-          router.push({
-            pathname: "/(tabs)",
-          });
+    if (users.length > 0) {
+      users.map((user) => {
+        if (identifier == user.email || identifier == user.phone) {
+          if (password == user.password) {
+            saveUserSession(user.id!);
+
+            router.push({
+              pathname: "/(tabs)",
+            });
+          } else {
+            Toast.show({
+              type: "error",
+              text1: "Identifiant invalide",
+              text2: "Veuillez entrer les bons identifiants",
+            });
+          }
         } else {
           Toast.show({
             type: "error",
@@ -54,14 +62,14 @@ export default function LoginScreen() {
             text2: "Veuillez entrer les bons identifiants",
           });
         }
-      } else {
-        Toast.show({
-          type: "error",
-          text1: "Identifiant invalide",
-          text2: "Veuillez entrer les bons identifiants",
-        });
-      }
-    });
+      });
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Identifiant invalide",
+        text2: "Veuillez entrer les bons identifiants",
+      });
+    }
   };
 
   return (

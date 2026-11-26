@@ -15,6 +15,7 @@ export default function RootLayout() {
       <Stack.Screen name="profil" options={{ headerShown: false }} />
       <Stack.Screen name="parametre" options={{ headerShown: false }} />
       <Stack.Screen name="rapport" options={{ headerShown: false }} />
+      <Stack.Screen name="deconnexion" options={{ headerShown: false }} />
     </Stack>
   );
 }

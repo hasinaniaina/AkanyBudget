@@ -1,6 +1,6 @@
 import * as Crypto from "expo-crypto";
+import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { User } from "./models/user";
 import { getAllUsers, insertVerificationCode } from "./services/user";
 
 export const phoneNumberRegex =
@@ -83,10 +83,12 @@ export async function saveUserSession(userId: string): Promise<boolean> {
 export async function handleLogout() {
   await SecureStore.deleteItemAsync("local_session_token");
   await SecureStore.deleteItemAsync("logged_user_id");
+  router.push("/(auth)/login");
   // Rediriger ensuite l'utilisateur vers l'écran de connexion
 }
 
-export async function getUserConnected(): Promise<User | null> {
+export async function getUserConnected(): Promise<boolean> {
+  let userConnected = false;
   const localSessionToken = await SecureStore.getItemAsync(
     "local_session_token",
   );
@@ -94,14 +96,16 @@ export async function getUserConnected(): Promise<User | null> {
 
   if (localSessionToken && userId) {
     const users = getAllUsers();
-    users.map((user) => {
-      if (user.id == userId) {
-        return user;
-      }
-    });
-  }
 
-  return null;
+    if (users.length > 0) {
+      users.map((user) => {
+        if (user.id == userId) {
+          userConnected = true;
+        }
+      });
+    }
+  }
+  return userConnected;
 }
 
 export const formatDate = (rawDate: Date): string => {
@@ -109,4 +113,9 @@ export const formatDate = (rawDate: Date): string => {
   const month = String(rawDate.getMonth() + 1).padStart(2, "0");
   const year = rawDate.getFullYear();
   return `${day} / ${month} / ${year}`;
+};
+
+export const daysInThisMonth = () => {
+  var now = new Date();
+  return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
 };

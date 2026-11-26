@@ -1,5 +1,5 @@
 import { FieldsColors as COLORS } from "@/constants/theme";
-import { useModalStore } from "@/store/useModalStore";
+import { useModalStore } from "@/hooks/useModalStore";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router";
 
@@ -74,6 +74,17 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="(budget)/creationCategorie"
+        options={{
+          headerShown: false,
+          title: "Création d'une catégorie",
+          href: null,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="(budget)/nouvelleCategorie"
         options={{
           headerShown: false,
           title: "Création d'une catégorie",

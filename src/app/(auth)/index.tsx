@@ -1,12 +1,20 @@
 import { getUserConnected } from "@/utils";
-import { Redirect } from "expo-router";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
 
 export default function index() {
-  const user = getUserConnected();
+  const [user, setUser] = useState<boolean>(false);
 
-  if (!user) {
-    return <Redirect href="/(auth)/login" />;
-  } else {
-    return <Redirect href={"/(tabs)"} />;
-  }
+  useEffect(() => {
+    const userConnected = async () => {
+      const userIsConnected = await getUserConnected();
+      if (userIsConnected) {
+        router.push("/(tabs)");
+      } else {
+        router.push("/(auth)/login");
+      }
+      setUser(userIsConnected);
+    };
+    userConnected();
+  }, []);
 }

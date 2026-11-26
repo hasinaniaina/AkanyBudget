@@ -3,13 +3,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -19,12 +19,31 @@ interface IconOption {
 }
 
 const ICONS_LIST: IconOption[] = [
-  { id: "1", name: "briefcase" },
-  { id: "2", name: "storefront" },
-  { id: "3", name: "cart" },
-  { id: "4", name: "home" },
-  { id: "5", name: "cash" },
-  { id: "6", name: "add-circle" },
+  { id: "1", name: "cash-outline" },
+  { id: "2", name: "wallet-outline" },
+  { id: "3", name: "card-outline" },
+  { id: "4", name: "briefcase-outline" },
+  { id: "5", name: "trending-up-outline" },
+  { id: "6", name: "business-outline" },
+  { id: "7", name: "storefront-outline" },
+  { id: "8", name: "cart-outline" },
+  { id: "9", name: "home-outline" },
+  { id: "10", name: "leaf-outline" },
+  { id: "11", name: "laptop-outline" },
+  { id: "12", name: "construct-outline" },
+  { id: "13", name: "car-outline" },
+  { id: "14", name: "gift-outline" },
+  { id: "15", name: "ribbon-outline" },
+  { id: "16", name: "pie-chart-outline" },
+  { id: "17", name: "phone-portrait-outline" },
+  { id: "18", name: "repeat-outline" },
+  { id: "19", name: "pricetag-outline" },
+  { id: "20", name: "hammer-outline" },
+  { id: "21", name: "globe-outline" },
+  { id: "22", name: "server-outline" },
+  { id: "23", name: "people-outline" },
+  { id: "24", name: "key-outline" },
+  { id: "25", name: "receipt-outline" },
 ];
 
 export default function AddRevenueSourceScreen() {
@@ -53,13 +72,6 @@ export default function AddRevenueSourceScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* 2. CERCLE D'APERÇU DE L'ICÔNE */}
-        <View style={styles.iconPreviewContainer}>
-          <View style={styles.mainIconCircle}>
-            <Ionicons name="add" size={38} color="#0A7B3E" />
-          </View>
-        </View>
-
         {/* 3. NOM DE LA SOURCE */}
         <Text style={styles.label}>Nom de la source *</Text>
         <View style={styles.inputContainer}>
