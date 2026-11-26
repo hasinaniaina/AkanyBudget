@@ -4,7 +4,7 @@ import { Source } from "@/models/source";
 export function insertSource(source: Source): boolean {
   try {
     const statement = db.prepareSync(
-      "INSERT INTO source (id, label, description, icon_url, status) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO source (id, label, description, icon_url, status, id_user) VALUES (?, ?, ?, ?, ?, ?)",
     );
 
     statement.executeSync([
@@ -13,6 +13,7 @@ export function insertSource(source: Source): boolean {
       source.description,
       source.icon_url,
       String(source.status),
+      source.id_user!,
     ]);
     statement.finalizeSync();
 
@@ -37,13 +38,14 @@ export function getAllSources(): Source[] {
 export function updateSource(source: Source): boolean {
   try {
     const statement = db.prepareSync(
-      `UPDATE source SET label = ?, description = ?, icon_url = ? , status = ? WHERE id = ?;`,
+      `UPDATE source SET label = ?, description = ?, icon_url = ? , status = ?, id_user = ? WHERE id = ?;`,
     );
     const result = statement.executeSync([
       source.label,
       source.description,
       source.icon_url,
       String(source.status),
+      source.id_user!,
       source.id!,
     ]);
     statement.finalizeSync();

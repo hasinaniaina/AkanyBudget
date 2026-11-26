@@ -23,6 +23,7 @@ export function initDatabase() {
 
       CREATE TABLE IF NOT EXISTS budget (
         id TEXT PRIMARY KEY NOT NULL,
+        id_user TEXT NOT NULL,
         label TEXT NOT NULL,
         icon_background_color TEXT NOT NULL,
         icon TEXT NOT NULL,
@@ -33,16 +34,19 @@ export function initDatabase() {
         status TEXT NOT NULL,
         period TEXT NOT NULL,
         limit_type TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (id_user) REFERENCES user(id)
       );
 
       CREATE TABLE IF NOT EXISTS source (
         id TEXT PRIMARY KEY NOT NULL,
+        id_user TEXT NOT NULL,
         label TEXT NOT NULL,
         description TEXT NOT NULL,
         icon_url  TEXT NOT NULL,
         status INTEGER NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (id_user) REFERENCES user(id)
       );
 
       CREATE TABLE IF NOT EXISTS operation (

@@ -1,7 +1,9 @@
 import { FieldsColors, FontSizes } from "@/constants/theme";
+import { Source } from "@/models/source";
 import { getAllSources } from "@/services/source";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import {
   ScrollView,
   StyleSheet,
@@ -11,54 +13,24 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-interface RevenueSource {
-  id: string;
-  title: string;
-  subtitle: string;
-  icon: keyof typeof Ionicons.glyphMap;
-}
-
-const REVENUE_SOURCES: RevenueSource[] = [
-  {
-    id: "1",
-    title: "Salaire",
-    subtitle: "Revenu professionnel",
-    icon: "briefcase",
-  },
-  {
-    id: "2",
-    title: "BSF",
-    subtitle: "Activité commerciale",
-    icon: "storefront",
-  },
-  {
-    id: "3",
-    title: "Commerce",
-    subtitle: "Ventes et activités",
-    icon: "cart",
-  },
-  {
-    id: "4",
-    title: "Location",
-    subtitle: "Revenus locatifs",
-    icon: "home",
-  },
-  {
-    id: "5",
-    title: "Autres revenus",
-    subtitle: "Autres entrées d'argent",
-    icon: "add-circle",
-  },
-];
-
 export default function SourceRevenu() {
-  const sources = getAllSources();
-  const nombreSources = sources.length;
+  const idUserConnected = SecureStore.getItem("logged_user_id");
+  const AllSources = getAllSources();
+
+  let theSource: Source[] = [];
+
+  AllSources.map((sources) => {
+    if (sources.id_user == idUserConnected) {
+      theSource.push(sources);
+    }
+  });
+
+  const nombreSources = theSource.length;
 
   const editSource = (editSourceId?: string) => {
     let editingSource = undefined;
 
-    sources.map((source) => {
+    theSource.map((source) => {
       if (source.id == editSourceId) {
         editingSource = source;
       }
@@ -103,7 +75,7 @@ export default function SourceRevenu() {
         </TouchableOpacity>
       </View>
 
-      {sources.length == 0 ? (
+      {theSource.length == 0 ? (
         <View style={styles.emptyStateContainer}>
           {/* Pastille vert pâle + icône carnet/dossier */}
           <View style={styles.illustrationCircle}>
@@ -125,7 +97,7 @@ export default function SourceRevenu() {
         >
           {/* 3. LISTE DES SOURCES DE REVENUS */}
           <View style={styles.listContainer}>
-            {sources.map((source) => (
+            {theSource.map((source) => (
               <TouchableOpacity
                 key={source.id}
                 style={styles.sourceCard}

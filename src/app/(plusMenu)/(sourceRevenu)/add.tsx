@@ -4,6 +4,7 @@ import { insertSource, updateSource } from "@/services/source";
 import { generateId, parseBoolean } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import {
   ScrollView,
@@ -60,13 +61,18 @@ const sourceTmp = {
 
 export default function AddRevenueSourceScreen() {
   const { theSource } = useLocalSearchParams();
-  const editingSource: Source = JSON.parse(theSource as string);
+  const editingSource: Source = theSource
+    ? JSON.parse(theSource as string)
+    : undefined;
 
   const [source, setSource] = useState<Source>(
     editingSource ? editingSource : sourceTmp,
   );
 
   const saveSource = () => {
+    const idUserConnected = SecureStore.getItem("logged_user_id");
+    source.id_user = idUserConnected!;
+
     if (source.label != "") {
       const unique_id = generateId();
       source.id = unique_id;
@@ -77,6 +83,8 @@ export default function AddRevenueSourceScreen() {
           text1: "Insertion réussi",
           text2: "L'insertion de la source à été réussi.",
         });
+
+        setSource(sourceTmp);
       } else {
         Toast.show({
           type: "error",
@@ -95,6 +103,8 @@ export default function AddRevenueSourceScreen() {
 
   const editSource = () => {
     if (source.label != "") {
+      console.log(source);
+
       const isUpdated = updateSource(source);
       if (isUpdated) {
         Toast.show({
