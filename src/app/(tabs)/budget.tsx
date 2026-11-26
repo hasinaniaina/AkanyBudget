@@ -2,10 +2,14 @@ import Annee from "@/components/budget/annee";
 import Mois from "@/components/budget/mois";
 import Trimestre from "@/components/budget/trimestre";
 import { FieldsColors, FontSizes } from "@/constants/theme";
+import { Budget } from "@/models/budget";
+import { getAllBudget } from "@/services/budget";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,65 +19,88 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function BudgetsScreen() {
+  const idUserConnected = SecureStore.getItem("logged_user_id");
+  const allBudget = getAllBudget();
+  let userBudget: Budget[] = [];
+
   const [selectedPeriod, setSelectedPeriod] = useState<
     "Mois" | "Trimestre" | "Année"
   >("Mois");
 
+  allBudget.map((budget) => {
+    if (budget.id_user == idUserConnected) {
+      userBudget.push(budget);
+    }
+  });
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* 1. EN-TÊTE */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Budgets</Text>
-          <TouchableOpacity
-            style={styles.manageButton}
-            activeOpacity={0.7}
-            onPress={() => router.push("/(tabs)/(budget)/gestionBudget")}
-          >
-            <Ionicons name="settings-outline" size={16} color="#117A53" />
-            <Text style={styles.manageButtonText}>Gérer les budgets</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* 2. SÉLECTEUR DE PÉRIODE (Mois / Trimestre / Année) */}
-        <View style={styles.periodTabsContainer}>
-          {(["Mois", "Trimestre", "Année"] as const).map((period) => {
-            const isActive = selectedPeriod === period;
-            return (
-              <TouchableOpacity
-                key={period}
-                style={[styles.periodTab, isActive && styles.activePeriodTab]}
-                onPress={() => setSelectedPeriod(period)}
-                activeOpacity={0.8}
-              >
-                <Text
-                  style={[
-                    styles.periodTabText,
-                    isActive && styles.activePeriodTabText,
-                  ]}
-                >
-                  {period}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        {selectedPeriod == "Mois" && <Mois />}
-        {selectedPeriod == "Trimestre" && <Trimestre />}
-        {selectedPeriod == "Année" && <Annee />}
-
-        {/* 6. BOUTON BAS DE PAGE */}
-        <TouchableOpacity style={styles.bottomButton} activeOpacity={0.8}>
-          <Text style={styles.bottomButtonText}>
-            Voir toutes les catégories
-          </Text>
+      {/* 1. EN-TÊTE */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Budgets</Text>
+        <TouchableOpacity
+          style={styles.manageButton}
+          activeOpacity={0.7}
+          onPress={() => router.push("/(tabs)/(budget)/gestionBudget")}
+        >
+          <Ionicons name="settings-outline" size={16} color="#117A53" />
+          <Text style={styles.manageButtonText}>Gérer les budgets</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
+      {userBudget.length > 0 ? (
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* 2. SÉLECTEUR DE PÉRIODE (Mois / Trimestre / Année) */}
+          <View style={styles.periodTabsContainer}>
+            {(["Mois", "Trimestre", "Année"] as const).map((period) => {
+              const isActive = selectedPeriod === period;
+              return (
+                <TouchableOpacity
+                  key={period}
+                  style={[styles.periodTab, isActive && styles.activePeriodTab]}
+                  onPress={() => setSelectedPeriod(period)}
+                  activeOpacity={0.8}
+                >
+                  <Text
+                    style={[
+                      styles.periodTabText,
+                      isActive && styles.activePeriodTabText,
+                    ]}
+                  >
+                    {period}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {selectedPeriod == "Mois" && <Mois budgets={userBudget} />}
+          {selectedPeriod == "Trimestre" && <Trimestre budgets={userBudget} />}
+          {selectedPeriod == "Année" && <Annee budgets={userBudget} />}
+
+          {/* 6. BOUTON BAS DE PAGE */}
+          <TouchableOpacity style={styles.bottomButton} activeOpacity={0.8}>
+            <Text style={styles.bottomButtonText}>
+              Voir toutes les catégories
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      ) : (
+        <View style={styles.emptyContainer}>
+          {/* Remplace par <Image source={require('./assets/empty-budget.png')} style={styles.emptyImage} /> */}
+          <View style={styles.illustrationPlaceholder}>
+            <Image
+              source={require("@/assets/images/empty-budget.png")}
+              style={styles.emptyImage}
+            />
+          </View>
+          <Text style={styles.emptyTitle}>Aucun budget enregistré</Text>
+          <Text style={styles.emptySubtitle}>Ta liste de budgets est vide</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -82,12 +109,13 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#F8FAFC",
+
+    paddingHorizontal: 18,
   },
   container: {
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 18,
     paddingTop: 12,
     paddingBottom: 30,
   },
@@ -149,5 +177,36 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.small,
     fontWeight: "600",
     color: "#475569",
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingBottom: 40,
+  },
+  illustrationPlaceholder: {
+    width: 120,
+    height: 110,
+    borderRadius: 24,
+    backgroundColor: "#EFF7F3",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  emptyImage: {
+    width: 150,
+    height: 120,
+    resizeMode: "contain",
+    marginBottom: 14,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#343A40",
+    marginBottom: 6,
+  },
+  emptySubtitle: {
+    fontSize: 13.5,
+    color: "#7D868E",
   },
 });

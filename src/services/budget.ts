@@ -8,8 +8,8 @@ export function insertBudget(budget: Budget): boolean {
   try {
     const statement = db.prepareSync(
       `INSERT INTO budget (id, label, icon_background_color, 
-      icon, monthly_amount, unit_amount, unit, number, status, period, limit_type)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      icon, monthly_amount, unit_amount, unit, number, status, period, limit_type, id_user)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     );
 
     statement.executeSync([
@@ -24,6 +24,7 @@ export function insertBudget(budget: Budget): boolean {
       String(budget.status),
       budget.period,
       budget.limit_type,
+      budget.id_user!,
     ]);
     statement.finalizeSync();
 
@@ -32,5 +33,15 @@ export function insertBudget(budget: Budget): boolean {
   } catch (error) {
     console.error("Erreur lors de l'insertion de l'utilisateur :", error);
     return false;
+  }
+}
+
+export function getAllBudget(): Budget[] {
+  try {
+    const sources = db.getAllSync("SELECT * FROM budget;");
+    return sources as Budget[];
+  } catch (error) {
+    console.error("Erreur lors de la récupération des utilisateurs :", error);
+    return [];
   }
 }

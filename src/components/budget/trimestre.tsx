@@ -1,4 +1,5 @@
 import { FieldsColors, FontSizes } from "@/constants/theme";
+import { Budget } from "@/models/budget";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -62,7 +63,7 @@ const CATEGORIES_DATA: CategoryBudget[] = [
   },
 ];
 
-export default function Trimestre() {
+export default function Trimestre({ budgets }: { budgets: Budget[] }) {
   return (
     <>
       {/* 3. NAVIGATION DE DATE */}

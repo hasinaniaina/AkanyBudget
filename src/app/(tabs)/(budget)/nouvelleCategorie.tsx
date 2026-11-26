@@ -9,6 +9,7 @@ import { insertBudget } from "@/services/budget";
 import { generateId, parseBoolean } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import {
   ScrollView,
@@ -48,6 +49,8 @@ let budget_tmp: Budget = {
 };
 
 export default function CategoryFormScreen() {
+  const idUserConnected = SecureStore.getItem("logged_user_id");
+
   const now = new Date();
 
   const [budget, setBudget] = useState<Budget>(budget_tmp);
@@ -68,6 +71,8 @@ export default function CategoryFormScreen() {
   }, []);
 
   const saveBudget = () => {
+    budget.id_user = idUserConnected!;
+
     if (budget.label != "") {
       const unique_id = generateId();
       budget.id = unique_id;

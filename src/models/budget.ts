@@ -11,5 +11,6 @@ export interface Budget {
   number: string;
   status: boolean;
   period: string;
+  id_user?: string;
   limit_type: "exact" | "automatic";
 }

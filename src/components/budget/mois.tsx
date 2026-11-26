@@ -1,4 +1,5 @@
 import { FieldsColors, FontSizes } from "@/constants/theme";
+import { Budget } from "@/models/budget";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -62,7 +63,23 @@ const CATEGORIES_DATA: CategoryBudget[] = [
   },
 ];
 
-export default function Mois() {
+export default function Mois({ budgets }: { budgets: Budget[] }) {
+  let userBudgets: Budget[] = [];
+  let spentAmount = 0;
+  let limtCountBudget = 10;
+  let initCountBudget = 0;
+
+  budgets.map((budget) => {
+    if (initCountBudget <= limtCountBudget) {
+      userBudgets.push(budget);
+    }
+
+    if (budget.limit_type == "exact") {
+      spentAmount += Number(budget.monthly_amount);
+    } else {
+      spentAmount += Number(budget.unit_amount) * Number(budget.number);
+    }
+  });
   return (
     <>
       {/* 3. NAVIGATION DE DATE */}
@@ -80,7 +97,7 @@ export default function Mois() {
       <View style={styles.summaryCard}>
         <Text style={styles.summaryLabel}>Dépenses du mois</Text>
         <View style={styles.amountRow}>
-          <Text style={styles.spentAmount}>980 000 Ar</Text>
+          <Text style={styles.spentAmount}>{spentAmount} Ar</Text>
           <Text style={styles.totalBudget}> / 1 500 000 Ar</Text>
         </View>
 
@@ -103,9 +120,9 @@ export default function Mois() {
 
       {/* LISTE DES CATÉGORIES */}
       <View style={styles.categoriesList}>
-        {CATEGORIES_DATA.map((item) => (
+        {userBudgets.map((budget) => (
           <TouchableOpacity
-            key={item.id}
+            key={budget.id}
             style={styles.categoryRow}
             activeOpacity={0.7}
           >
@@ -113,27 +130,28 @@ export default function Mois() {
             <View
               style={[
                 styles.categoryIconCircle,
-                { backgroundColor: item.color },
+                { backgroundColor: budget.icon_background_color },
               ]}
             >
-              {item.iconLibrary === "Ionicons" ? (
-                <Ionicons name={item.icon as any} size={14} color="#FFFFFF" />
-              ) : (
-                <MaterialCommunityIcons
-                  name={item.icon as any}
-                  size={20}
-                  color="#FFFFFF"
-                />
-              )}
+              <Ionicons name={budget.icon as any} size={14} color="#FFFFFF" />
             </View>
 
             {/* Nom de la catégorie */}
-            <Text style={styles.categoryName}>{item.name}</Text>
+            <Text style={styles.categoryName}>{budget.label}</Text>
 
             {/* Montant et pourcentage alignés à droite */}
             <View style={styles.categoryRight}>
-              <Text style={styles.categoryAmount}>{item.amount}</Text>
-              <Text style={styles.categoryPercent}>{item.percentage}%</Text>
+              {budget.limit_type == "exact" ? (
+                <Text style={styles.categoryAmount}>
+                  {budget.monthly_amount}
+                </Text>
+              ) : (
+                <Text style={styles.categoryAmount}>
+                  {String(Number(budget.unit_amount) * Number(budget.number))}
+                </Text>
+              )}
+
+              {/* <Text style={styles.categoryPercent}>{item.percentage}%</Text> */}
             </View>
           </TouchableOpacity>
         ))}
