@@ -100,7 +100,7 @@ export default function AddRevenueSourceScreen() {
         <TouchableOpacity
           style={styles.backButton}
           activeOpacity={0.7}
-          onPress={() => router.back()}
+          onPress={() => router.push("/(plusMenu)/sourceRevenu")}
         >
           <Ionicons name="chevron-back" size={22} color={FieldsColors.green} />
         </TouchableOpacity>

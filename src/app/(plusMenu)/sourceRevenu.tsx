@@ -1,7 +1,14 @@
 import { FieldsColors, FontSizes } from "@/constants/theme";
+import { getAllSources } from "@/services/source";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface RevenueSource {
@@ -45,6 +52,9 @@ const REVENUE_SOURCES: RevenueSource[] = [
 ];
 
 export default function SourceRevenu() {
+  const sources = getAllSources();
+  const nombreSources = sources.length;
+
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       {/* 1. EN-TÊTE */}
@@ -61,7 +71,9 @@ export default function SourceRevenu() {
       </View>
       {/* 2. CARTE BANNIÈRE SUPÉRIEURE */}
       <View style={styles.bannerCard}>
-        <Text style={styles.bannerTitle}>5 sources de revenus</Text>
+        <Text style={styles.bannerTitle}>
+          {nombreSources} sources de revenus
+        </Text>
         <Text style={styles.bannerSubtitle}>
           Gérez vos différentes sources de revenus.
         </Text>
@@ -76,19 +88,67 @@ export default function SourceRevenu() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.emptyStateContainer}>
-        {/* Pastille vert pâle + icône carnet/dossier */}
-        <View style={styles.illustrationCircle}>
-          <Ionicons name="journal-outline" size={44} color="#4B5563" />
-          <View style={styles.secondaryBadge}>
-            <Ionicons name="folder-outline" size={22} color="#6B7280" />
+      {sources.length == 0 ? (
+        <View style={styles.emptyStateContainer}>
+          {/* Pastille vert pâle + icône carnet/dossier */}
+          <View style={styles.illustrationCircle}>
+            <Ionicons name="journal-outline" size={44} color="#4B5563" />
+            <View style={styles.secondaryBadge}>
+              <Ionicons name="folder-outline" size={22} color="#6B7280" />
+            </View>
           </View>
-        </View>
 
-        <Text style={styles.emptyTitle}>Aucune source de revenus</Text>
-        <Text style={styles.emptyTitleSecondLine}>enregistrée</Text>
-        <Text style={styles.emptySubtitle}>Votre liste est vide</Text>
-      </View>
+          <Text style={styles.emptyTitle}>Aucune source de revenus</Text>
+          <Text style={styles.emptyTitleSecondLine}>enregistrée</Text>
+          <Text style={styles.emptySubtitle}>Votre liste est vide</Text>
+        </View>
+      ) : (
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* 3. LISTE DES SOURCES DE REVENUS */}
+          <View style={styles.listContainer}>
+            {sources.map((source) => (
+              <TouchableOpacity
+                key={source.id}
+                style={styles.sourceCard}
+                activeOpacity={0.75}
+              >
+                {/* Conteneur carré arrondi pour l'icône */}
+                <View style={styles.iconContainer}>
+                  <Ionicons
+                    name={source.icon_url as keyof typeof Ionicons.glyphMap}
+                    size={24}
+                    color="#0A7B3E"
+                  />
+                </View>
+
+                {/* Textes (Titre et sous-titre) */}
+                <View style={styles.textContainer}>
+                  <Text style={styles.sourceTitle}>{source.label}</Text>
+                  <Text style={styles.sourceSubtitle}>
+                    {source.description}
+                  </Text>
+                </View>
+
+                {/* Menu trois points verticaux */}
+                <TouchableOpacity
+                  style={styles.moreButton}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Ionicons
+                    name="ellipsis-vertical"
+                    size={18}
+                    color="#719082"
+                  />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }

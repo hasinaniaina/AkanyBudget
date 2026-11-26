@@ -23,3 +23,13 @@ export function insertSource(source: Source): boolean {
     return false;
   }
 }
+
+export function getAllSources(): Source[] {
+  try {
+    const sources = db.getAllSync("SELECT * FROM source;");
+    return sources as Source[];
+  } catch (error) {
+    console.error("Erreur lors de la récupération des utilisateurs :", error);
+    return [];
+  }
+}
