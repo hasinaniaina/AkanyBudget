@@ -1,7 +1,10 @@
 import { FieldsColors, FontSizes } from "@/constants/theme";
+import { Source } from "@/models/source";
+import { insertSource } from "@/services/source";
+import { generateId } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -12,6 +15,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 interface IconOption {
   id: string;
@@ -46,11 +50,48 @@ const ICONS_LIST: IconOption[] = [
   { id: "25", name: "receipt-outline" },
 ];
 
+const sourceTmp = {
+  id: "",
+  label: "",
+  description: "",
+  icon_url: "cash-outline",
+  status: true,
+};
+
 export default function AddRevenueSourceScreen() {
-  const [nomSource, setNomSource] = useState("");
-  const [description, setDescription] = useState("");
-  const [selectedIcon, setSelectedIcon] = useState("briefcase");
-  const [isStatutActive, setIsStatutActive] = useState(true);
+  const [source, setSource] = useState<Source>(sourceTmp);
+  const [isStatutActive, setIsStatutActive] = useState(source.status);
+
+  const saveSource = () => {
+    if (source.label != "" && source.description != "") {
+      const unique_id = generateId();
+      source.id = unique_id;
+      const isInserted = insertSource(source);
+      if (isInserted) {
+        Toast.show({
+          type: "success",
+          text1: "Insertion réussi",
+          text2: "L'insertion de la source à été réussi.",
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Insertion Invalide",
+          text2: "Problème d'insertion de la Source.",
+        });
+      }
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Insertion Invalide",
+        text2: "Tout les champs doivent être rempli.",
+      });
+    }
+  };
+
+  useEffect(() => {
+    setSource({ ...source, status: isStatutActive });
+  }, [isStatutActive]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -79,8 +120,10 @@ export default function AddRevenueSourceScreen() {
             style={styles.input}
             placeholder="Ex. Salaire, Commerce..."
             placeholderTextColor="#A0AAB2"
-            value={nomSource}
-            onChangeText={setNomSource}
+            value={source.label}
+            onChangeText={(label) => {
+              setSource({ ...source, label: label });
+            }}
           />
         </View>
 
@@ -93,8 +136,10 @@ export default function AddRevenueSourceScreen() {
             placeholderTextColor="#A0AAB2"
             multiline={true}
             numberOfLines={3}
-            value={description}
-            onChangeText={setDescription}
+            value={source.description}
+            onChangeText={(description) => {
+              setSource({ ...source, description: description });
+            }}
             textAlignVertical="top"
           />
         </View>
@@ -103,12 +148,12 @@ export default function AddRevenueSourceScreen() {
         <Text style={styles.label}>Icône</Text>
         <View style={styles.iconsGrid}>
           {ICONS_LIST.map((item) => {
-            const isSelected = selectedIcon === item.name;
+            const isSelected = source.icon_url === item.name;
             return (
               <TouchableOpacity
                 key={item.id}
                 style={[styles.iconCard, isSelected && styles.selectedIconCard]}
-                onPress={() => setSelectedIcon(item.name)}
+                onPress={() => setSource({ ...source, icon_url: item.name })}
                 activeOpacity={0.8}
               >
                 <Ionicons
@@ -133,7 +178,13 @@ export default function AddRevenueSourceScreen() {
         </View>
 
         {/* 7. BOUTON DE VALIDATION EN BAS */}
-        <TouchableOpacity style={styles.submitButton} activeOpacity={0.85}>
+        <TouchableOpacity
+          style={styles.submitButton}
+          activeOpacity={0.85}
+          onPress={() => {
+            saveSource();
+          }}
+        >
           <Text style={styles.submitButtonText}>Enregistrer</Text>
         </TouchableOpacity>
       </ScrollView>
