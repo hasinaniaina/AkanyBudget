@@ -33,3 +33,24 @@ export function getAllSources(): Source[] {
     return [];
   }
 }
+
+export function updateSource(source: Source): boolean {
+  try {
+    const statement = db.prepareSync(
+      `UPDATE source SET label = ?, description = ?, icon_url = ? , status = ? WHERE id = ?;`,
+    );
+    const result = statement.executeSync([
+      source.label,
+      source.description,
+      source.icon_url,
+      String(source.status),
+      source.id!,
+    ]);
+    statement.finalizeSync();
+
+    return result.changes > 0;
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du mot de passe :", error);
+    return false;
+  }
+}

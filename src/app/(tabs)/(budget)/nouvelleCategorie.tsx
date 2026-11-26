@@ -6,7 +6,7 @@ import { DEFAULT_MONTHS_FR } from "@/constants/month";
 import { FieldsColors, FontSizes, PaddingBottom } from "@/constants/theme";
 import { Budget } from "@/models/budget";
 import { insertBudget } from "@/services/budget";
-import { generateId } from "@/utils";
+import { generateId, parseBoolean } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -325,7 +325,7 @@ export default function CategoryFormScreen() {
         <View style={styles.statusRow}>
           <Text style={styles.statusLabel}>Statut</Text>
           <Switch
-            value={Boolean(isStatutActive)}
+            value={parseBoolean(isStatutActive)}
             onValueChange={setIsStatutActive}
             trackColor={{ false: "#E2ECE7", true: "#0A7B3E" }}
             thumbColor={"#FFFFFF"}

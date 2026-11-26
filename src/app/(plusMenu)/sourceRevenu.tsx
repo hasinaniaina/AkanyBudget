@@ -55,6 +55,21 @@ export default function SourceRevenu() {
   const sources = getAllSources();
   const nombreSources = sources.length;
 
+  const editSource = (editSourceId?: string) => {
+    let editingSource = undefined;
+
+    sources.map((source) => {
+      if (source.id == editSourceId) {
+        editingSource = source;
+      }
+    });
+
+    router.push({
+      pathname: "/(plusMenu)/(sourceRevenu)/add",
+      params: { theSource: JSON.stringify(editingSource) },
+    });
+  };
+
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       {/* 1. EN-TÊTE */}
@@ -115,6 +130,9 @@ export default function SourceRevenu() {
                 key={source.id}
                 style={styles.sourceCard}
                 activeOpacity={0.75}
+                onPress={() => {
+                  editSource(source.id);
+                }}
               >
                 {/* Conteneur carré arrondi pour l'icône */}
                 <View style={styles.iconContainer}>

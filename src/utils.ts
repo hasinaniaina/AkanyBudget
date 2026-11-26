@@ -119,3 +119,17 @@ export const daysInThisMonth = () => {
   var now = new Date();
   return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
 };
+
+export function parseBoolean(
+  value: string | boolean | null | undefined,
+  defaultValue = true,
+): boolean {
+  if (typeof value === "boolean") return value;
+  if (typeof value !== "string") return defaultValue;
+
+  const normalized = value.trim().toLowerCase();
+  if (normalized === "true" || normalized === "1") return true;
+  if (normalized === "false" || normalized === "0") return false;
+
+  return defaultValue;
+}

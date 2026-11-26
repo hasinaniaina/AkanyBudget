@@ -1,10 +1,10 @@
 import { FieldsColors, FontSizes } from "@/constants/theme";
 import { Source } from "@/models/source";
-import { insertSource } from "@/services/source";
-import { generateId } from "@/utils";
+import { insertSource, updateSource } from "@/services/source";
+import { generateId, parseBoolean } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -59,11 +59,15 @@ const sourceTmp = {
 };
 
 export default function AddRevenueSourceScreen() {
-  const [source, setSource] = useState<Source>(sourceTmp);
-  const [isStatutActive, setIsStatutActive] = useState(source.status);
+  const { theSource } = useLocalSearchParams();
+  const editingSource: Source = JSON.parse(theSource as string);
+
+  const [source, setSource] = useState<Source>(
+    editingSource ? editingSource : sourceTmp,
+  );
 
   const saveSource = () => {
-    if (source.label != "" && source.description != "") {
+    if (source.label != "") {
       const unique_id = generateId();
       source.id = unique_id;
       const isInserted = insertSource(source);
@@ -84,14 +88,39 @@ export default function AddRevenueSourceScreen() {
       Toast.show({
         type: "error",
         text1: "Insertion Invalide",
-        text2: "Tout les champs doivent être rempli.",
+        text2: "Le nom de la Source est requis",
       });
     }
   };
 
-  useEffect(() => {
-    setSource({ ...source, status: isStatutActive });
-  }, [isStatutActive]);
+  const editSource = () => {
+    if (source.label != "") {
+      const isUpdated = updateSource(source);
+      if (isUpdated) {
+        Toast.show({
+          type: "success",
+          text1: "Mofication réussi",
+          text2: "La modification de la source à été réussi.",
+        });
+
+        setTimeout(() => {
+          router.push("/(plusMenu)/sourceRevenu");
+        }, 1000);
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Modification Invalide",
+          text2: "Problème d'insertion de la Source.",
+        });
+      }
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Modifiaction Invalide",
+        text2: "Le champs nom de la Source est requis.",
+      });
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -170,23 +199,37 @@ export default function AddRevenueSourceScreen() {
         <View style={styles.statusRow}>
           <Text style={styles.statusLabel}>Statut</Text>
           <Switch
-            value={isStatutActive}
-            onValueChange={setIsStatutActive}
+            value={parseBoolean(source.status)}
+            onValueChange={(isActive) => {
+              setSource({ ...source, status: isActive });
+            }}
             trackColor={{ false: "#E2ECE7", true: "#0A7B3E" }}
             thumbColor={"#FFFFFF"}
           />
         </View>
 
         {/* 7. BOUTON DE VALIDATION EN BAS */}
-        <TouchableOpacity
-          style={styles.submitButton}
-          activeOpacity={0.85}
-          onPress={() => {
-            saveSource();
-          }}
-        >
-          <Text style={styles.submitButtonText}>Enregistrer</Text>
-        </TouchableOpacity>
+        {editingSource ? (
+          <TouchableOpacity
+            style={styles.submitButton}
+            activeOpacity={0.85}
+            onPress={() => {
+              editSource();
+            }}
+          >
+            <Text style={styles.submitButtonText}>Modifier</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.submitButton}
+            activeOpacity={0.85}
+            onPress={() => {
+              saveSource();
+            }}
+          >
+            <Text style={styles.submitButtonText}>Enregistrer</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
