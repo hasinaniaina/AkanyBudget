@@ -38,7 +38,9 @@ export function insertBudget(budget: Budget): boolean {
 
 export function getAllBudget(): Budget[] {
   try {
-    const sources = db.getAllSync("SELECT * FROM budget;");
+    const sources = db.getAllSync(
+      "SELECT * FROM budget ORDER BY created_at DESC;",
+    );
     return sources as Budget[];
   } catch (error) {
     console.error("Erreur lors de la récupération des utilisateurs :", error);

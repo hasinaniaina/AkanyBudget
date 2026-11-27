@@ -62,17 +62,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="(budget)/gestionBudget"
-        options={{
-          headerShown: false,
-          title: "Gestion des budgets",
-          href: null,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="(budget)/nouvelleCategorie"
         options={{
           headerShown: false,

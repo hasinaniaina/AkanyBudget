@@ -136,6 +136,13 @@ export function parseBoolean(
   return defaultValue;
 }
 
+export const formatAmount = (value: number, currency = "Ar"): string => {
+  const formatted = Math.round(value)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  return `${formatted} ${currency}`;
+};
+
 export function getIdCurrentUser() {
   const idUserConnected = SecureStore.getItem("logged_user_id");
   return idUserConnected;
