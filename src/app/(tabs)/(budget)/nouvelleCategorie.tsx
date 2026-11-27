@@ -115,7 +115,7 @@ export default function CategoryFormScreen() {
         <TouchableOpacity
           style={styles.backButton}
           activeOpacity={0.7}
-          onPress={() => router.push("/(tabs)/(budget)/gestionBudget")}
+          onPress={() => router.push("/(tabs)/budget")}
         >
           <Ionicons name="chevron-back" size={20} color={FieldsColors.green} />
         </TouchableOpacity>

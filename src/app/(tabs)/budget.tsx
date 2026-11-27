@@ -4,7 +4,7 @@ import { FieldsColors, FontSizes } from "@/constants/theme";
 import { Budget } from "@/models/budget";
 import { getAllBudgetCurrentUser } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   Image,
@@ -73,95 +73,111 @@ export default function BudgetsScreen() {
       let initCountBudget = 0;
 
       budgets.map((budget) => {
-        if (initCountBudget <= limtCountBudget) {
+        if (periodConcerne == budget.period) {
           userBudgets.push(budget);
-        }
-
-        if (budget.limit_type == "exact") {
-          totalAmount += Number(budget.monthly_amount);
-        } else {
-          totalAmount += Number(budget.unit_amount) * Number(budget.number);
+          if (budget.limit_type == "exact") {
+            totalAmount += Number(budget.monthly_amount);
+          } else {
+            totalAmount += Number(budget.unit_amount) * Number(budget.number);
+          }
         }
       });
 
-      setUserBudgets(budgets);
+      setUserBudgets(userBudgets.slice(0, 10));
       setTotalAmount(totalAmount);
-    }, []),
+    }, [periodConcerne]),
   );
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
       {/* 1. EN-TÊTE */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Budgets</Text>
+
+        <TouchableOpacity
+          style={styles.addButtonContainer}
+          onPress={() => router.push("/(tabs)/(budget)/nouvelleCategorie")}
+        >
+          <TouchableOpacity style={styles.addButton} activeOpacity={0.8}>
+            <Ionicons name="add" size={FontSizes.small} color="#FFFFFF" />
+          </TouchableOpacity>
+          <Text style={styles.addText}>Ajouter un budget</Text>
+        </TouchableOpacity>
       </View>
+      {/* 3. NAVIGATION DE DATE */}
+      <View style={styles.dateSelector}>
+        <TouchableOpacity style={styles.arrowButton} activeOpacity={0.6}>
+          <Ionicons
+            name="arrow-back-circle"
+            size={18}
+            color={FieldsColors.green}
+            onPress={prevPeriodConcern}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            setIsDateYearPickerOpen(!isDateYearPickerOpen);
+          }}
+        >
+          <Text style={styles.dateText}>{periodConcerne}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.arrowButton}
+          activeOpacity={0.6}
+          onPress={nextPeriodConcern}
+        >
+          <Ionicons
+            name="arrow-forward-circle"
+            size={18}
+            color={FieldsColors.green}
+          />
+        </TouchableOpacity>
+      </View>
+      <MonthYearPicker
+        periodConcerne={periodConcerne}
+        setPeriodConcerne={setPeriodConcerne}
+        isOpen={isDateYearPickerOpen}
+        setIsOpen={setIsDateYearPickerOpen}
+        isBudgetListView={true}
+      />
+
+      {/* 4. CARTE RÉSUMÉ : DÉPENSES DU MOIS */}
+      <View style={styles.summaryCard}>
+        <Text style={styles.summaryLabel}>Dépenses du mois</Text>
+        <View style={styles.amountRow}>
+          <Text style={styles.spentAmount}>0 Ar</Text>
+          <Text style={styles.totalBudget}> / {totalAmount} Ar</Text>
+        </View>
+
+        {/* Barre de progression */}
+        <View style={styles.progressRow}>
+          <View style={styles.progressBarBackground}>
+            <View style={[styles.progressBarFill, { width: "65%" }]} />
+          </View>
+          <Text style={styles.progressPercentage}>65%</Text>
+        </View>
+      </View>
+
+      {/* 5. SECTION : PAR CATÉGORIE */}
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Par catégorie</Text>
+        <TouchableOpacity activeOpacity={0.7}>
+          <Text style={styles.seeAllText}>
+            Voir toutes les catégories
+            <Ionicons
+              name="chevron-down"
+              size={FontSizes.small}
+              color="#64748B"
+            />
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       {userBudgets.length > 0 ? (
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* 3. NAVIGATION DE DATE */}
-          <View style={styles.dateSelector}>
-            <TouchableOpacity style={styles.arrowButton} activeOpacity={0.6}>
-              <Ionicons
-                name="arrow-back-circle"
-                size={18}
-                color={FieldsColors.green}
-                onPress={prevPeriodConcern}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setIsDateYearPickerOpen(!isDateYearPickerOpen);
-              }}
-            >
-              <Text style={styles.dateText}>{periodConcerne}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.arrowButton}
-              activeOpacity={0.6}
-              onPress={nextPeriodConcern}
-            >
-              <Ionicons
-                name="arrow-forward-circle"
-                size={18}
-                color={FieldsColors.green}
-              />
-            </TouchableOpacity>
-          </View>
-          <MonthYearPicker
-            periodConcerne={periodConcerne}
-            setPeriodConcerne={setPeriodConcerne}
-            isOpen={isDateYearPickerOpen}
-            setIsOpen={setIsDateYearPickerOpen}
-            isBudgetListView={true}
-          />
-
-          {/* 4. CARTE RÉSUMÉ : DÉPENSES DU MOIS */}
-          <View style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>Dépenses du mois</Text>
-            <View style={styles.amountRow}>
-              <Text style={styles.spentAmount}>0 Ar</Text>
-              <Text style={styles.totalBudget}> / {totalAmount} Ar</Text>
-            </View>
-
-            {/* Barre de progression */}
-            <View style={styles.progressRow}>
-              <View style={styles.progressBarBackground}>
-                <View style={[styles.progressBarFill, { width: "65%" }]} />
-              </View>
-              <Text style={styles.progressPercentage}>65%</Text>
-            </View>
-          </View>
-
-          {/* 5. SECTION : PAR CATÉGORIE */}
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Par catégorie</Text>
-            <TouchableOpacity activeOpacity={0.7}>
-              <Text style={styles.seeAllText}>Voir tout</Text>
-            </TouchableOpacity>
-          </View>
-
           {/* LISTE DES CATÉGORIES */}
           <View style={styles.categoriesList}>
             {userBudgets.map((budget) => (
@@ -208,11 +224,11 @@ export default function BudgetsScreen() {
           </View>
 
           {/* 6. BOUTON BAS DE PAGE */}
-          <TouchableOpacity style={styles.bottomButton} activeOpacity={0.8}>
+          {/* <TouchableOpacity style={styles.bottomButton} activeOpacity={0.8}>
             <Text style={styles.bottomButtonText}>
               Voir toutes les catégories
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </ScrollView>
       ) : (
         <View style={styles.emptyContainer}>
@@ -256,6 +272,28 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.xlarge,
     fontWeight: "bold",
     color: FieldsColors.green,
+  },
+  addButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 17,
+    backgroundColor: "#0A5C36", // Vert principal AkanyBudget
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#0A5C36",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  addButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  addText: {
+    marginLeft: 10,
+    color: FieldsColors.green,
+    fontWeight: "500",
   },
   manageButton: {
     flexDirection: "row",
@@ -353,7 +391,7 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: FontSizes.small,
     fontWeight: "700",
-    color: "#1E293B",
+    color: FieldsColors.green,
   },
   /* Summary Card */
   summaryCard: {
