@@ -77,7 +77,7 @@ export default function GestionBudget() {
           <TouchableOpacity
             style={styles.backButton}
             activeOpacity={0.7}
-            onPress={() => router.back()}
+            onPress={() => router.push("/(tabs)/budget")}
           >
             <Ionicons
               name="chevron-back"

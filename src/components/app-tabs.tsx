@@ -73,17 +73,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="(budget)/creationCategorie"
-        options={{
-          headerShown: false,
-          title: "Création d'une catégorie",
-          href: null,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="(budget)/nouvelleCategorie"
         options={{
           headerShown: false,

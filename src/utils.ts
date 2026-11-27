@@ -1,6 +1,8 @@
 import * as Crypto from "expo-crypto";
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import { Budget } from "./models/budget";
+import { getAllBudget } from "./services/budget";
 import { getAllUsers, insertVerificationCode } from "./services/user";
 
 export const phoneNumberRegex =
@@ -132,4 +134,22 @@ export function parseBoolean(
   if (normalized === "false" || normalized === "0") return false;
 
   return defaultValue;
+}
+
+export function getIdCurrentUser() {
+  const idUserConnected = SecureStore.getItem("logged_user_id");
+  return idUserConnected;
+}
+
+export function getAllBudgetCurrentUser() {
+  let idUserConnected = getIdCurrentUser();
+  let userBudget: Budget[] = [];
+
+  const allBudget = getAllBudget();
+  allBudget.map((budget) => {
+    if (budget.id_user == idUserConnected) {
+      userBudget.push(budget);
+    }
+  });
+  return userBudget;
 }

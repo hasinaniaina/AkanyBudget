@@ -3,11 +3,10 @@ import Mois from "@/components/budget/mois";
 import Trimestre from "@/components/budget/trimestre";
 import { FieldsColors, FontSizes } from "@/constants/theme";
 import { Budget } from "@/models/budget";
-import { getAllBudget } from "@/services/budget";
+import { getAllBudgetCurrentUser } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-import { useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   Image,
   ScrollView,
@@ -19,20 +18,17 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function BudgetsScreen() {
-  const idUserConnected = SecureStore.getItem("logged_user_id");
-  const allBudget = getAllBudget();
-  let userBudget: Budget[] = [];
-
   const [selectedPeriod, setSelectedPeriod] = useState<
     "Mois" | "Trimestre" | "Année"
   >("Mois");
+  const [userBudget, setUserBudget] = useState<Budget[]>([]);
 
-  allBudget.map((budget) => {
-    if (budget.id_user == idUserConnected) {
-      userBudget.push(budget);
-    }
-  });
-
+  useFocusEffect(
+    useCallback(() => {
+      const budgets = getAllBudgetCurrentUser();
+      setUserBudget(budgets);
+    }, []),
+  );
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* 1. EN-TÊTE */}

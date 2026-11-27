@@ -80,6 +80,7 @@ export default function Mois({ budgets }: { budgets: Budget[] }) {
       spentAmount += Number(budget.unit_amount) * Number(budget.number);
     }
   });
+
   return (
     <>
       {/* 3. NAVIGATION DE DATE */}
