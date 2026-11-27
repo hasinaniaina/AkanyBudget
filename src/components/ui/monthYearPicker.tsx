@@ -1,5 +1,6 @@
 import { DEFAULT_MONTHS_FR } from "@/constants/month";
 import { FieldsColors, FontSizes } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -9,6 +10,7 @@ interface MonthYearPickerProps {
   localeMonths?: string[];
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
+  isBudgetListView?: boolean;
 }
 
 export default function MonthYearPicker({
@@ -17,10 +19,14 @@ export default function MonthYearPicker({
   localeMonths = DEFAULT_MONTHS_FR,
   isOpen,
   setIsOpen,
+  isBudgetListView = false,
 }: MonthYearPickerProps) {
   const periodSplited = periodConcerne.split(" ");
   const periodYear = Number(periodSplited[1]);
   const periodMonth = DEFAULT_MONTHS_FR.indexOf(periodSplited[0]);
+
+  const currentMonthIndexInArray = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
 
   const [year, setYear] = useState<number>(periodYear);
   const [selectedYear, setSelectedYear] = useState<number>(periodYear);
@@ -43,7 +49,15 @@ export default function MonthYearPicker({
   };
 
   return (
-    <View style={[isOpen ? styles.card : { display: "none" }]}>
+    <View
+      style={[
+        isOpen
+          ? !isBudgetListView
+            ? styles.card
+            : styles.budgetList
+          : { display: "none" },
+      ]}
+    >
       {/* En-tête : < Année > */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -52,7 +66,14 @@ export default function MonthYearPicker({
           activeOpacity={0.7}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Text style={styles.arrowText}>{"<"}</Text>
+          <Ionicons
+            name="arrow-back-circle"
+            style={[
+              year - 1 >= Number(currentYear)
+                ? styles.arrowText
+                : { display: "none" },
+            ]}
+          />
         </TouchableOpacity>
 
         <Text style={styles.yearText}>{year}</Text>
@@ -63,7 +84,7 @@ export default function MonthYearPicker({
           activeOpacity={0.7}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Text style={styles.arrowText}>{">"}</Text>
+          <Ionicons name="arrow-forward-circle" style={styles.arrowText} />
         </TouchableOpacity>
       </View>
 
@@ -78,10 +99,19 @@ export default function MonthYearPicker({
               style={[styles.monthCell, isSelected && styles.monthCellSelected]}
               onPress={() => handleSelectMonth(index)}
               activeOpacity={0.75}
+              disabled={
+                year <= currentYear && index < Number(currentMonthIndexInArray)
+                  ? true
+                  : false
+              }
             >
               <Text
                 style={[
                   styles.monthText,
+                  year <= currentYear &&
+                  index < Number(currentMonthIndexInArray)
+                    ? styles.monthTextDisabled
+                    : styles.monthTextActive,
                   isSelected && styles.monthTextSelected,
                 ]}
               >
@@ -96,6 +126,20 @@ export default function MonthYearPicker({
 }
 
 const styles = StyleSheet.create({
+  budgetList: {
+    backgroundColor: "#ffffffff",
+    borderRadius: 15,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    width: "100%",
+    maxWidth: 360,
+    alignSelf: "center",
+    position: "absolute",
+    top: 67,
+    zIndex: 10,
+    borderWidth: 1,
+    borderColor: "#e9e9e9ff",
+  },
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 8,
@@ -113,7 +157,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 12,
+    paddingHorizontal: 40,
     marginBottom: 14,
   },
   arrowButton: {
@@ -123,12 +167,12 @@ const styles = StyleSheet.create({
   arrowText: {
     fontSize: 20,
     color: FieldsColors.green,
-    fontWeight: "400",
+    fontWeight: "bold",
   },
   yearText: {
     fontSize: FontSizes.small,
-    color: "#6B7280",
-    fontWeight: "400",
+    color: FieldsColors.text,
+    fontWeight: "bold",
   },
   grid: {
     flexDirection: "row",
@@ -146,8 +190,13 @@ const styles = StyleSheet.create({
   },
   monthText: {
     fontSize: FontSizes.small,
+    fontWeight: "600",
+  },
+  monthTextDisabled: {
+    color: "#dbdbdbff",
+  },
+  monthTextActive: {
     color: "#6B7280",
-    fontWeight: "400",
   },
   monthTextSelected: {
     color: "#FFFFFF",

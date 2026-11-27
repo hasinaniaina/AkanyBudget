@@ -1,8 +1,10 @@
+import MonthYearPicker from "@/components/ui/monthYearPicker";
+import { DEFAULT_MONTHS_FR } from "@/constants/month";
 import { FieldsColors, FontSizes } from "@/constants/theme";
 import { Budget } from "@/models/budget";
 import { getAllBudgetCurrentUser } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
-import { router, useFocusEffect } from "expo-router";
+import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   Image,
@@ -15,8 +17,52 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function BudgetsScreen() {
+  const now = new Date();
   const [userBudgets, setUserBudgets] = useState<Budget[]>([]);
   const [totalAmount, setTotalAmount] = useState<number>(0);
+
+  const [isDateYearPickerOpen, setIsDateYearPickerOpen] =
+    useState<boolean>(false);
+  const currentPeriodConcerne =
+    DEFAULT_MONTHS_FR[now.getMonth()] + " " + now.getFullYear();
+  const [periodConcerne, setPeriodConcerne] = useState<string>(
+    currentPeriodConcerne,
+  );
+
+  const prevPeriodConcern = () => {
+    const periodConcernSplited = periodConcerne.split(" ");
+    const monthConcern = periodConcernSplited[0];
+    let yearConcern = Number(periodConcernSplited[1]);
+    const indexMonth = DEFAULT_MONTHS_FR.indexOf(monthConcern);
+    let newIndexMonthConcern = indexMonth - 1;
+    let newMonthConcern = DEFAULT_MONTHS_FR[newIndexMonthConcern];
+
+    if (newIndexMonthConcern < 0) {
+      newIndexMonthConcern = 11;
+      yearConcern -= 1;
+      newMonthConcern = DEFAULT_MONTHS_FR[newIndexMonthConcern];
+    }
+
+    setPeriodConcerne(newMonthConcern + " " + yearConcern);
+  };
+
+  const nextPeriodConcern = () => {
+    const periodConcernSplited = periodConcerne.split(" ");
+    const monthConcern = periodConcernSplited[0];
+    let yearConcern = Number(periodConcernSplited[1]);
+
+    const indexMonth = DEFAULT_MONTHS_FR.indexOf(monthConcern);
+    let newIndexMonthConcern = indexMonth + 1;
+    let newMonthConcern = DEFAULT_MONTHS_FR[newIndexMonthConcern];
+
+    if (newIndexMonthConcern > 11) {
+      newIndexMonthConcern = 0;
+      yearConcern += 1;
+      newMonthConcern = DEFAULT_MONTHS_FR[newIndexMonthConcern];
+    }
+
+    setPeriodConcerne(newMonthConcern + " " + yearConcern);
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -47,14 +93,6 @@ export default function BudgetsScreen() {
       {/* 1. EN-TÊTE */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Budgets</Text>
-        <TouchableOpacity
-          style={styles.manageButton}
-          activeOpacity={0.7}
-          onPress={() => router.push("/(tabs)/(budget)/gestionBudget")}
-        >
-          <Ionicons name="settings-outline" size={16} color="#117A53" />
-          <Text style={styles.manageButtonText}>Gérer les budgets</Text>
-        </TouchableOpacity>
       </View>
       {userBudgets.length > 0 ? (
         <ScrollView
@@ -65,13 +103,39 @@ export default function BudgetsScreen() {
           {/* 3. NAVIGATION DE DATE */}
           <View style={styles.dateSelector}>
             <TouchableOpacity style={styles.arrowButton} activeOpacity={0.6}>
-              <Ionicons name="chevron-back" size={18} color="#2D3748" />
+              <Ionicons
+                name="arrow-back-circle"
+                size={18}
+                color={FieldsColors.green}
+                onPress={prevPeriodConcern}
+              />
             </TouchableOpacity>
-            <Text style={styles.dateText}>Novembre 2026</Text>
-            <TouchableOpacity style={styles.arrowButton} activeOpacity={0.6}>
-              <Ionicons name="chevron-forward" size={18} color="#2D3748" />
+            <TouchableOpacity
+              onPress={() => {
+                setIsDateYearPickerOpen(!isDateYearPickerOpen);
+              }}
+            >
+              <Text style={styles.dateText}>{periodConcerne}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.arrowButton}
+              activeOpacity={0.6}
+              onPress={nextPeriodConcern}
+            >
+              <Ionicons
+                name="arrow-forward-circle"
+                size={18}
+                color={FieldsColors.green}
+              />
             </TouchableOpacity>
           </View>
+          <MonthYearPicker
+            periodConcerne={periodConcerne}
+            setPeriodConcerne={setPeriodConcerne}
+            isOpen={isDateYearPickerOpen}
+            setIsOpen={setIsDateYearPickerOpen}
+            isBudgetListView={true}
+          />
 
           {/* 4. CARTE RÉSUMÉ : DÉPENSES DU MOIS */}
           <View style={styles.summaryCard}>
@@ -284,7 +348,7 @@ const styles = StyleSheet.create({
     borderColor: "#EDF2F7",
   },
   arrowButton: {
-    padding: 4,
+    padding: 6,
   },
   dateText: {
     fontSize: FontSizes.small,
